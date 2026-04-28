@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تسجيل دخول الناشرين | المحمودية مدينتي</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .login-container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+        .logo-title { color: #004a99; margin-bottom: 25px; font-size: 24px; font-weight: bold; }
+        
+        /* أزرار التواصل الاجتماعي */
+        .social-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: 0.3s;
+            background: white;
+        }
+        .btn-google:hover { background: #f8f8f8; }
+        .btn-fb { background: #1877f2; color: white; border: none; }
+        .btn-fb:hover { background: #166fe5; }
+        
+        .divider { margin: 20px 0; display: flex; align-items: center; color: #888; }
+        .divider::before, .divider::after { content: ""; flex: 1; height: 1px; background: #ddd; margin: 0 10px; }
+        
+        /* إدخال يدوي */
+        input {
+            width: 90%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: #f9f9f9;
+        }
+        .btn-login {
+            width: 100%;
+            padding: 14px;
+            background: #004a99;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .btn-login:hover { background: #003366; }
+    </style>
+</head>
+<body>
+
+<div class="login-container">
+    <div class="logo-title">المحمودية مدينتي 🏠</div>
+    <p style="color: #666; margin-bottom: 20px;">دخول المحررين والناشرين</p>
+
+    <button class="social-btn btn-google">
+        <img src="https://img.icons8.com/color/24/000000/google-logo.png" style="margin-left: 10px;">
+        الدخول بواسطة جوجل
+    </button>
+    <button class="social-btn btn-fb">
+        <img src="https://img.icons8.com/ios-filled/24/ffffff/facebook-new.png" style="margin-left: 10px;">
+        الدخول بواسطة فيسبوك
+    </button>
+
+    <div class="divider">أو إدخال يدوي</div>
+
+    <input type="text" id="adminUser" placeholder="اسم الناشر">
+    <input type="password" id="adminPass" placeholder="كلمة المرور الخاصة بالفريق">
+    
+    <button class="btn-login" onclick="checkLogin()">دخول للوحة النشر</button>
+</div>
+
+<script>
+    function checkLogin() {
+        const user = document.getElementById('adminUser').value;
+        const pass = document.getElementById('adminPass').value;
+        
+        // كلمة السر اللي أنت حددتها
+        const secretKey = "2009257ma";
+
+        if (pass === secretKey && user.trim() !== "") {
+            Swal.fire({
+                title: 'تم تسجيل الدخول!',
+                text: `أهلاً بك يا ${user} في فريق عمل المحمودية مدينتي`,
+                icon: 'success',
+                timer: 2000,
+                showConfirmButton: false
+            }).then(() => {
+                // هنا يتم توجيه الناشر لصفحة Firebase لإضافة الأخبار
+                window.location.href = "admin_dashboard.html"; 
+            });
+        } else {
+            Swal.fire('خطأ!', 'كلمة المرور غير صحيحة أو اسم المستخدم فارغ', 'error');
+        }
+    }
+</script>
+
+</body>
+</html>
