@@ -3,91 +3,68 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title id="siteTitleTag">المحمودية مدينتي</title>
-    
+    <title>إدارة أخبار المحمودية</title>
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
     <style>
-        :root { --primary: #1a73e8; --owner-color: #673ab7; --bg: #f1f3f4; --text: #202124; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding-bottom: 30px; }
+        :root { --primary: #1a73e8; --owner: #673ab7; --bg: #f8f9fa; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; }
+        header { background: white; padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); sticky; top: 0; z-index: 100; }
+        .logo-area { display: flex; align-items: center; gap: 10px; }
+        #siteLogo { width: 40px; height: 40px; border-radius: 50%; display: none; }
         
-        header { background: white; padding: 10px 5%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 3px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 1000; }
-        .logo-container { display: flex; align-items: center; gap: 12px; }
-        /* تصميم اللوجو */
-        #siteLogo { height: 40px; width: 40px; border-radius: 50%; object-fit: cover; display: none; border: 1px solid #ddd; }
-        header h1 { font-size: 1.1rem; color: var(--primary); margin: 0; }
-
-        .admin-btn { background: #f8f9fa; color: #5f6368; border: 1px solid #dadce0; padding: 8px; border-radius: 50%; cursor: pointer; width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; }
+        .panel { background: white; max-width: 600px; margin: 20px auto; padding: 20px; border-radius: 15px; display: none; border: 1px solid #ddd; }
+        .owner-section { border: 2px solid var(--owner); }
         
-        .panel { background: white; max-width: 550px; margin: 15px auto; padding: 20px; border-radius: 12px; box-shadow: 0 1px 2px rgba(0,0,0,0.1); display: none; border: 1px solid #dadce0; }
-        .owner-border { border-top: 5px solid var(--owner-color); }
+        .news-card { background: white; border-radius: 15px; margin: 15px auto; max-width: 600px; overflow: hidden; border: 1px solid #eee; position: relative; }
+        .news-card img { width: 100%; max-height: 400px; object-fit: cover; }
+        .news-info { padding: 15px; }
+        .author-tag { font-size: 12px; color: var(--primary); font-weight: bold; margin-bottom: 5px; display: block; }
         
-        input, textarea { width: 100%; padding: 12px; border: 1px solid #dadce0; border-radius: 8px; box-sizing: border-box; margin: 8px 0; font-size: 14px; background: #fafafa; }
-        .btn-submit { background: var(--primary); color: white; border: none; padding: 12px; width: 100%; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 10px; }
+        .admin-btn { cursor: pointer; background: #eee; border: none; padding: 8px 15px; border-radius: 20px; }
+        input, textarea { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 8px; }
+        .btn-blue { background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; width: 100%; }
         
-        .news-feed { max-width: 600px; margin: 10px auto; padding: 0 10px; }
-        .news-card { background: white; border-radius: 12px; margin-bottom: 12px; overflow: hidden; border: 1px solid #dadce0; position: relative; }
-        .news-card img { width: 100%; max-height: 350px; object-fit: cover; display: block; background: #f8f9fa; }
-        .news-content { padding: 15px; }
-        .news-content h2 { margin: 0 0 8px 0; font-size: 1.1rem; line-height: 1.4; color: #111; }
-        .news-content p { font-size: 0.95rem; color: #3c4043; line-height: 1.6; margin: 0; white-space: pre-wrap; }
-        
-        .card-meta { margin-top: 12px; font-size: 0.75rem; color: #70757a; border-top: 1px solid #f1f1f1; padding-top: 10px; }
-        .delete-btn { position: absolute; top: 10px; left: 10px; background: rgba(217, 48, 37, 0.9); color: white; border: none; padding: 5px 10px; border-radius: 6px; cursor: pointer; font-size: 12px; z-index: 10; display: none; }
-
-        .img-helper { background: #fff3cd; padding: 10px; border-radius: 8px; font-size: 12px; margin: 10px 0; border-right: 4px solid #ffc107; color: #856404; }
-        footer { text-align: center; padding: 20px; color: #70757a; font-size: 12px; }
+        .request-item { background: #f0f7ff; padding: 10px; margin: 10px 0; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; }
+        .approve-btn { background: #28a745; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; }
     </style>
 </head>
 <body>
 
 <header>
-    <div class="logo-container">
-        <img id="siteLogo" src="" alt="Logo">
-        <h1 id="displaySiteName">المحمودية مدينتي</h1>
+    <div class="logo-area">
+        <img id="siteLogo" src="">
+        <h1 id="siteNameDisplay" style="font-size: 1.2rem; margin: 0;">المحمودية</h1>
     </div>
-    <button class="admin-btn" onclick="loginSystem()"><i class="fas fa-user-cog"></i></button>
+    <button class="admin-btn" onclick="handleLogin()"><i class="fas fa-lock"></i> دخول</button>
 </header>
 
-<div id="owner-panel" class="panel owner-border">
-    <h3 style="color: var(--owner-color); margin-top: 0;"><i class="fas fa-crown"></i> إعدادات المالك</h3>
-    
-    <label style="font-size: 13px;">اسم الموقع الجديد:</label>
-    <input type="text" id="newSiteName" placeholder="أدخل اسم الموقع هنا">
-    
-    <label style="font-size: 13px;">رابط لوجو الموقع (Direct Link):</label>
-    <input type="text" id="newLogoUrl" placeholder="رابط الصورة المباشر للوجو">
-    <div class="img-helper">ارفع اللوجو على ImgBB وانسخ "الرابط المباشر".</div>
-    
-    <button class="btn-submit" style="background: var(--owner-color);" onclick="updateSettings()">حفظ التغييرات</button>
-    <hr style="margin: 20px 0; border: 0; border-top: 1px solid #eee;">
-    <input type="text" id="newPubPass" placeholder="تغيير باسورد الناشرين">
-    <button class="btn-submit" style="background: #5f6368;" onclick="changePass()">تغيير الباسورد</button>
+<div id="owner-panel" class="panel owner-section">
+    <h3 style="color: var(--owner);"><i class="fas fa-crown"></i> لوحة المالك النجم</h3>
+    <div id="pendingRequests">
+        <p style="font-size: 13px; color: #666;">لا توجد طلبات انضمام حالياً.</p>
+    </div>
+    <hr>
+    <input type="text" id="setSiteName" placeholder="اسم الموقع">
+    <input type="text" id="setLogo" placeholder="رابط اللوجو المباشر">
+    <button class="btn-blue" style="background:var(--owner)" onclick="saveSettings()">حفظ الإعدادات</button>
 </div>
 
 <div id="publisher-panel" class="panel">
-    <h3><i class="fas fa-pen-nib"></i> نشر خبر جديد</h3>
-    <input type="text" id="postTitle" placeholder="عنوان الخبر الرئيسي">
-    <textarea id="postText" rows="4" placeholder="اكتب تفاصيل الخبر هنا..."></textarea>
-    
-    <div class="img-helper">
-        <i class="fas fa-image"></i> لإضافة صورة: ارفعها على <a href="https://imgbb.com/" target="_blank">ImgBB</a> ثم ضع "الرابط المباشر" بالأسفل.
-    </div>
-    <input type="text" id="postImageUrl" placeholder="رابط الصورة (اختياري)">
-    
-    <button class="btn-submit" onclick="publishNews()">نشر الآن</button>
+    <h3><i class="fas fa-plus"></i> إضافة خبر جديد</h3>
+    <p id="welcomeMsg" style="font-size: 13px; color: var(--primary);"></p>
+    <input type="text" id="newsTitle" placeholder="عنوان الخبر">
+    <textarea id="newsContent" rows="4" placeholder="تفاصيل الخبر..."></textarea>
+    <input type="text" id="newsImg" placeholder="رابط الصورة المباشر (ImgBB)">
+    <button class="btn-blue" onclick="postNews()">نشر الخبر</button>
 </div>
 
-<div class="news-feed" id="newsFeed">
-    </div>
-
-<footer>جميع الحقوق محفوظة &copy; 2026 | تطوير النجم</footer>
+<div id="newsFeed"></div>
 
 <script>
-    // إعدادات Firebase الخاصة بك
     const firebaseConfig = {
         databaseURL: "https://mahmodya-73e03-default-rtdb.firebaseio.com",
         projectId: "mahmodya-73e03",
@@ -95,119 +72,117 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    let currentRole = "";
-    let currentPubPass = "2009257ma";
+    let userRole = "";
+    let userData = null;
+    let siteSettings = {};
 
-    // مزامنة الإعدادات (الاسم واللوجو)
-    db.ref('settings').on('value', (snapshot) => {
-        const s = snapshot.val();
-        if (s) {
-            document.getElementById('displaySiteName').innerText = s.siteName || "المحمودية مدينتي";
-            document.getElementById('siteTitleTag').innerText = s.siteName || "المحمودية مدينتي";
-            
-            const logo = document.getElementById('siteLogo');
-            if (s.logoUrl) {
-                logo.src = s.logoUrl;
-                logo.style.display = 'block';
-            } else {
-                logo.style.display = 'none';
-            }
-            currentPubPass = s.pubPass || "2009257ma";
+    // جلب الإعدادات
+    db.ref('settings').on('value', s => {
+        siteSettings = s.val() || {};
+        document.getElementById('siteNameDisplay').innerText = siteSettings.siteName || "المحمودية مدينتي";
+        if(siteSettings.logoUrl) {
+            document.getElementById('siteLogo').src = siteSettings.logoUrl;
+            document.getElementById('siteLogo').style.display = 'block';
         }
     });
 
-    async function loginSystem() {
-        const { value: pass } = await Swal.fire({
-            title: 'لوحة التحكم',
-            input: 'password',
-            confirmButtonText: 'دخول'
-        });
-
+    // نظام الدخول المعقد
+    async function handleLogin() {
+        const { value: pass } = await Swal.fire({ title: 'أدخل كلمة السر', input: 'password' });
+        
         if (pass === "2009257mama") {
-            currentRole = "owner";
+            userRole = "owner";
             document.getElementById('owner-panel').style.display = 'block';
             document.getElementById('publisher-panel').style.display = 'block';
-        } else if (pass === currentPubPass) {
-            currentRole = "publisher";
-            document.getElementById('publisher-panel').style.display = 'block';
-            document.getElementById('owner-panel').style.display = 'none';
+            loadPending();
+            loadNews();
+        } else if (pass === (siteSettings.pubPass || "2009257ma")) {
+            const { value: info } = await Swal.fire({
+                title: 'بيانات الناشر',
+                html: '<input id="n" class="swal2-input" placeholder="الاسم المعتمد"><input id="p" class="swal2-input" placeholder="رقم الموبايل">',
+                preConfirm: () => [document.getElementById('n').value, document.getElementById('p').value]
+            });
+            
+            if(info[0] && info[1]) {
+                checkPublisher(info[0], info[1]);
+            }
         }
-        loadNews();
     }
 
-    function updateSettings() {
-        const name = document.getElementById('newSiteName').value;
-        const logo = document.getElementById('newLogoUrl').value;
-        const updates = {};
-        if(name) updates.siteName = name;
-        if(logo) updates.logoUrl = logo;
-        db.ref('settings').update(updates).then(() => Swal.fire('تم الحفظ!'));
-    }
-
-    function changePass() {
-        const p = document.getElementById('newPubPass').value;
-        if(p) db.ref('settings').update({ pubPass: p }).then(() => Swal.fire('تم التغيير'));
-    }
-
-    function publishNews() {
-        const t = document.getElementById('postTitle').value;
-        const c = document.getElementById('postText').value;
-        const i = document.getElementById('postImageUrl').value;
-        if(!t || !c) return Swal.fire('خطأ', 'يرجى كتابة العنوان والمحتوى', 'error');
-
-        db.ref('news_posts').push({
-            title: t,
-            content: c,
-            image: i,
-            timestamp: Date.now()
-        }).then(() => {
-            Swal.fire('تم النشر بنجاح');
-            document.getElementById('postTitle').value = "";
-            document.getElementById('postText').value = "";
-            document.getElementById('postImageUrl').value = "";
+    function checkPublisher(name, phone) {
+        db.ref('approved_publishers').child(phone).once('value', s => {
+            if(s.exists()) {
+                userRole = "publisher";
+                userData = { name, phone };
+                document.getElementById('publisher-panel').style.display = 'block';
+                document.getElementById('welcomeMsg').innerText = "مرحباً يا " + name;
+                loadNews();
+            } else {
+                db.ref('pending_publishers').child(phone).set({ name, phone });
+                Swal.fire('طلبك قيد المراجعة', 'تم إرسال بياناتك للمالك، انتظر الموافقة للنشر.', 'info');
+            }
         });
     }
 
-    function timeAgo(ts) {
-        const d = Math.floor((Date.now() - ts) / 1000);
-        if (d < 60) return "الآن";
-        if (d < 3600) return `منذ ${Math.floor(d/60)} دقيقة`;
-        if (d < 86400) return `منذ ${Math.floor(d/3600)} ساعة`;
-        return new Date(ts).toLocaleDateString('ar-EG');
-    }
-
-    function loadNews() {
-        db.ref('news_posts').on('value', (snapshot) => {
-            const feed = document.getElementById('newsFeed');
-            feed.innerHTML = "";
-            snapshot.forEach((child) => {
-                const val = child.val();
-                const key = child.key;
-                const card = `
-                    <div class="news-card">
-                        ${currentRole === 'owner' ? `<button class="delete-btn" style="display:block" onclick="deleteP('${key}')">حذف الخبر</button>` : ''}
-                        ${val.image ? `<img src="${val.image}">` : ''}
-                        <div class="news-content">
-                            <h2>${val.title}</h2>
-                            <p>${val.content}</p>
-                            <div class="card-meta"><i class="far fa-clock"></i> ${timeAgo(val.timestamp)}</div>
-                        </div>
-                    </div>
-                `;
-                feed.insertAdjacentHTML('afterbegin', card);
+    function loadPending() {
+        db.ref('pending_publishers').on('value', s => {
+            const div = document.getElementById('pendingRequests');
+            div.innerHTML = "<h4>طلبات انضمام جديدة:</h4>";
+            s.forEach(child => {
+                const p = child.val();
+                div.innerHTML += `<div class="request-item">
+                    <span>${p.name} (${p.phone})</span>
+                    <button class="approve-btn" onclick="approvePub('${p.name}','${p.phone}')">موافقة</button>
+                </div>`;
             });
         });
     }
 
-    function deleteP(k) {
-        Swal.fire({
-            title: 'حذف الخبر؟',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'نعم'
-        }).then(res => {
-            if(res.isConfirmed) db.ref('news_posts').child(k).remove();
+    function approvePub(name, phone) {
+        db.ref('approved_publishers').child(phone).set({ name }).then(() => {
+            db.ref('pending_publishers').child(phone).remove();
         });
+    }
+
+    function postNews() {
+        const t = document.getElementById('newsTitle').value;
+        const c = document.getElementById('newsContent').value;
+        let i = document.getElementById('newsImg').value;
+        
+        if(i.includes('[img]')) i = i.match(/\[img\](.*?)\[\/img\]/)[1];
+
+        db.ref('news_posts').push({
+            title: t, content: c, image: i,
+            author: userData ? userData.name : "المالك",
+            phone: userData ? userData.phone : "إدارة الموقع",
+            timestamp: Date.now()
+        }).then(() => Swal.fire('تم النشر!'));
+    }
+
+    function loadNews() {
+        db.ref('news_posts').on('value', s => {
+            const feed = document.getElementById('newsFeed');
+            feed.innerHTML = "";
+            s.forEach(child => {
+                const v = child.val();
+                feed.insertAdjacentHTML('afterbegin', `
+                    <div class="news-card">
+                        ${v.image ? `<img src="${v.image}">` : ''}
+                        <div class="news-info">
+                            <span class="author-tag">نشر بواسطة: ${v.author} ${userRole==='owner' ? '('+v.phone+')' : ''}</span>
+                            <h2>${v.title}</h2>
+                            <p>${v.content}</p>
+                        </div>
+                    </div>
+                `);
+            });
+        });
+    }
+
+    function saveSettings() {
+        const name = document.getElementById('setSiteName').value;
+        const logo = document.getElementById('setLogo').value;
+        db.ref('settings').update({ siteName: name, logoUrl: logo });
     }
 
     loadNews();
