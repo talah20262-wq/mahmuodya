@@ -3,100 +3,121 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة تحكم | المحمودية مدينتي</title>
-    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
+    <title>المحمودية مدينتي | بوابة الأخبار</title>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    
     <style>
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f0f2f5; margin: 0; }
-        .hidden { display: none !important; }
+        :root { --main-blue: #004a99; --bg: #f0f2f5; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding-bottom: 50px; }
         
-        /* تصميم صفحة الدخول */
-        #login-page { height: 100vh; display: flex; justify-content: center; align-items: center; }
-        .login-card { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 350px; text-align: center; }
-        
-        /* تصميم لوحة التحكم (الادمن) */
-        #admin-panel { padding: 20px; max-width: 800px; margin: auto; }
-        .post-box { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
-        input, textarea { width: 95%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; }
-        .btn { padding: 12px 25px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; }
-        .btn-blue { background: #1877f2; color: white; margin-top: 10px; }
-        .btn-google { background: white; border: 1px solid #ddd; margin-bottom: 10px; }
+        /* الهيدر */
+        header { background: var(--main-blue); color: white; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
+        header h1 { font-size: 20px; margin: 0; }
+        .admin-trigger { background: rgba(255,255,255,0.2); padding: 5px 15px; border-radius: 5px; cursor: pointer; font-size: 14px; }
+
+        /* لوحة النشر (مخفية) */
+        #publisher-panel { background: white; max-width: 600px; margin: 20px auto; padding: 20px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); display: none; }
+        .input-group { margin-bottom: 15px; }
+        input, textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+        .btn-publish { background: var(--main-blue); color: white; border: none; padding: 12px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; }
+
+        /* عرض الأخبار */
+        .news-feed { max-width: 600px; margin: 20px auto; padding: 0 10px; }
+        .news-card { background: white; border-radius: 10px; margin-bottom: 20px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .news-card img { width: 100%; height: auto; display: block; }
+        .news-content { padding: 15px; }
+        .news-content h2 { margin: 0 0 10px 0; font-size: 18px; color: #333; }
+        .news-content p { color: #555; line-height: 1.6; margin: 0; }
+        .news-time { font-size: 12px; color: #999; margin-top: 10px; display: block; }
     </style>
 </head>
 <body>
 
-<div id="login-page">
-    <div class="login-card">
-        <h2>المحمودية مدينتي</h2>
-        <p>تسجيل دخول الناشرين</p>
-        
-        <button class="btn btn-google" onclick="loginWithGoogle()">
-            <img src="https://img.icons8.com/color/16/000000/google-logo.png"> الدخول بجوجل
-        </button>
-        
-        <div style="margin: 15px 0; color: #888;">أو يدوي</div>
-        
-        <input type="password" id="passInput" placeholder="كلمة سر الفريق">
-        <button class="btn btn-blue" onclick="manualLogin()">دخول</button>
+<header>
+    <h1>المحمودية مدينتي 🏠</h1>
+    <div class="admin-trigger" onclick="askForPass()">دخول الناشرين</div>
+</header>
+
+<div id="publisher-panel">
+    <h3>نشر خبر جديد 📝</h3>
+    <div class="input-group">
+        <input type="text" id="postTitle" placeholder="عنوان الخبر">
     </div>
+    <div class="input-group">
+        <textarea id="postText" rows="4" placeholder="ماذا يدور في المحمودية؟"></textarea>
+    </div>
+    <div class="input-group">
+        <label style="font-size: 14px; color: #666;">اختر صورة الخبر:</label>
+        <input type="file" id="postImage" accept="image/*" style="border:none;">
+    </div>
+    <button class="btn-publish" onclick="publishNow()">نشر الخبر للجميع</button>
 </div>
 
-<div id="admin-panel" class="hidden">
-    <div class="post-box">
-        <h2>نشر خبر جديد 📝</h2>
-        <p id="welcome-msg"></p>
-        <input type="text" id="newsTitle" placeholder="عنوان الخبر (مثلاً: حالة الطقس)">
-        <textarea id="newsContent" rows="5" placeholder="تفاصيل الخبر..."></textarea>
-        <button class="btn btn-blue" onclick="uploadNews()">نشر الخبر الآن</button>
-        <button onclick="location.reload()" style="background:none; border:none; color:red; cursor:pointer; margin-top:20px;">تسجيل خروج</button>
+<div class="news-feed" id="newsFeed">
+    <div class="news-card">
+        <img src="https://images.unsplash.com/photo-1504711432869-9d39d71ca0f0?w=600" alt="News">
+        <div class="news-content">
+            <h2>انطلاق الموقع الرسمي للمحمودية</h2>
+            <p>أهلاً بكم في المحمودية مدينتي، المنصة الأولى لمتابعة أخبار المركز والقرى لحظة بلحظة.</p>
+            <span class="news-time">منذ ساعة</span>
+        </div>
     </div>
 </div>
 
 <script>
-    // كلمة السر اللي أنت اخترتها
-    const TEAM_PASS = "2009257ma";
+    const SECRET_PASS = "2009257ma";
 
-    // 1. الدخول اليدوي
-    function manualLogin() {
-        const input = document.getElementById('passInput').value;
-        if(input === TEAM_PASS) {
-            showPanel("ناشر معتمد");
-        } else {
+    // وظيفة طلب الباسورد
+    async function askForPass() {
+        const { value: password } = await Swal.fire({
+            title: 'منطقة الناشرين',
+            input: 'password',
+            inputLabel: 'أدخل كلمة مرور الفريق',
+            inputPlaceholder: 'كلمة السر هنا...',
+            confirmButtonText: 'دخول'
+        });
+
+        if (password === SECRET_PASS) {
+            document.getElementById('publisher-panel').style.display = 'block';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            Swal.fire('أهلاً بك', 'يمكنك الآن نشر الأخبار', 'success');
+        } else if (password) {
             Swal.fire('خطأ', 'كلمة السر غلط يا مهند!', 'error');
         }
     }
 
-    // 2. الدخول بجوجل (محاكاة - ستحتاج لربط Firebase الحقيقي)
-    function loginWithGoogle() {
-        // هنا نضع كود Firebase Auth الفعلي
-        Swal.fire('جاري الربط', 'يتم التحقق من حساب جوجل...', 'info');
-        setTimeout(() => showPanel("مستخدم جوجل"), 2000);
-    }
-
-    // وظيفة تبديل الصفحات
-    function showPanel(user) {
-        document.getElementById('login-page').classList.add('hidden');
-        document.getElementById('admin-panel').classList.remove('hidden');
-        document.getElementById('welcome-msg').innerText = "أهلاً بك: " + user;
-        Swal.fire('مرحباً', 'تم فتح لوحة النشر بنجاح', 'success');
-    }
-
-    // وظيفة النشر (ترسل البيانات لـ Firebase)
-    function uploadNews() {
-        const title = document.getElementById('newsTitle').value;
-        const content = document.getElementById('newsContent').value;
+    // وظيفة النشر (محاكاة - سيحتاج Firebase للحفظ الدائم)
+    function publishNow() {
+        const title = document.getElementById('postTitle').value;
+        const text = document.getElementById('postText').value;
+        const imgInput = document.getElementById('postImage');
         
-        if(!title || !content) return Swal.fire('نقص بيانات', 'اكتب العنوان والتفاصيل الأول', 'warning');
+        if (!title || !text) return Swal.fire('تنبيه', 'كمل البيانات الأول', 'warning');
 
-        // هنا كود الـ Database.push
-        Swal.fire('تم النشر!', 'الخبر متاح الآن لكل أهل المحمودية على الموقع', 'success');
-        
-        // مسح الخانات بعد النشر
-        document.getElementById('newsTitle').value = "";
-        document.getElementById('newsContent').value = "";
+        // تحويل الصورة لرابط مؤقت للعرض
+        let imgUrl = "https://via.placeholder.com/600x300?text=No+Image";
+        if (imgInput.files && imgInput.files[0]) {
+            imgUrl = URL.createObjectURL(imgInput.files[0]);
+        }
+
+        const newPost = `
+            <div class="news-card">
+                <img src="${imgUrl}">
+                <div class="news-content">
+                    <h2>${title}</h2>
+                    <p>${text}</p>
+                    <span class="news-time">الآن</span>
+                </div>
+            </div>
+        `;
+
+        // إضافة الخبر في الأعلى
+        const feed = document.getElementById('newsFeed');
+        feed.insertAdjacentHTML('afterbegin', newPost);
+
+        // تنظيف الخانات
+        document.getElementById('postTitle').value = "";
+        document.getElementById('postText').value = "";
+        Swal.fire('تم النشر', 'الخبر ظهر للجميع الآن', 'success');
     }
 </script>
 
