@@ -3,123 +3,169 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>المحمودية مدينتي | بوابة الأخبار</title>
+    <title id="siteTitleTag">المحمودية مدينتي</title>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         :root { --main-blue: #004a99; --bg: #f0f2f5; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding-bottom: 50px; }
-        
-        /* الهيدر */
         header { background: var(--main-blue); color: white; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
-        header h1 { font-size: 20px; margin: 0; }
         .admin-trigger { background: rgba(255,255,255,0.2); padding: 5px 15px; border-radius: 5px; cursor: pointer; font-size: 14px; }
-
-        /* لوحة النشر (مخفية) */
-        #publisher-panel { background: white; max-width: 600px; margin: 20px auto; padding: 20px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); display: none; }
+        .panel { background: white; max-width: 600px; margin: 20px auto; padding: 20px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); display: none; }
         .input-group { margin-bottom: 15px; }
-        input, textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
-        .btn-publish { background: var(--main-blue); color: white; border: none; padding: 12px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; }
-
-        /* عرض الأخبار */
+        input, textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; margin-top: 5px; }
+        .btn { border: none; padding: 12px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .btn-blue { background: var(--main-blue); color: white; }
+        .btn-red { background: #d32f2f; color: white; }
         .news-feed { max-width: 600px; margin: 20px auto; padding: 0 10px; }
-        .news-card { background: white; border-radius: 10px; margin-bottom: 20px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .news-card img { width: 100%; height: auto; display: block; }
+        .news-card { background: white; border-radius: 10px; margin-bottom: 20px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.05); position: relative; }
         .news-content { padding: 15px; }
-        .news-content h2 { margin: 0 0 10px 0; font-size: 18px; color: #333; }
-        .news-content p { color: #555; line-height: 1.6; margin: 0; }
-        .news-time { font-size: 12px; color: #999; margin-top: 10px; display: block; }
+        .delete-btn { position: absolute; top: 10px; left: 10px; background: red; color: white; border: none; border-radius: 5px; cursor: pointer; padding: 5px; font-size: 12px; display: none; }
     </style>
 </head>
 <body>
 
 <header>
-    <h1>المحمودية مدينتي 🏠</h1>
-    <div class="admin-trigger" onclick="askForPass()">دخول الناشرين</div>
+    <h1 id="displaySiteName">المحمودية مدينتي 🏠</h1>
+    <div class="admin-trigger" onclick="loginSystem()">دخول الإدارة</div>
 </header>
 
-<div id="publisher-panel">
-    <h3>نشر خبر جديد 📝</h3>
-    <div class="input-group">
-        <input type="text" id="postTitle" placeholder="عنوان الخبر">
-    </div>
-    <div class="input-group">
-        <textarea id="postText" rows="4" placeholder="ماذا يدور في المحمودية؟"></textarea>
-    </div>
-    <div class="input-group">
-        <label style="font-size: 14px; color: #666;">اختر صورة الخبر:</label>
-        <input type="file" id="postImage" accept="image/*" style="border:none;">
-    </div>
-    <button class="btn-publish" onclick="publishNow()">نشر الخبر للجميع</button>
+<div id="publisher-panel" class="panel">
+    <h3>نشر خبر جديد (ناشر) 📝</h3>
+    <input type="text" id="postTitle" placeholder="عنوان الخبر">
+    <textarea id="postText" rows="4" placeholder="تفاصيل الخبر..."></textarea>
+    <button class="btn btn-blue" onclick="publishNow()">نشر الخبر</button>
 </div>
 
-<div class="news-feed" id="newsFeed">
-    <div class="news-card">
-        <img src="https://images.unsplash.com/photo-1504711432869-9d39d71ca0f0?w=600" alt="News">
-        <div class="news-content">
-            <h2>انطلاق الموقع الرسمي للمحمودية</h2>
-            <p>أهلاً بكم في المحمودية مدينتي، المنصة الأولى لمتابعة أخبار المركز والقرى لحظة بلحظة.</p>
-            <span class="news-time">منذ ساعة</span>
-        </div>
+<div id="owner-panel" class="panel">
+    <h3>إعدادات المالك 👑</h3>
+    <div style="background: #eee; padding: 10px; border-radius: 8px; margin-bottom: 10px;">
+        <label>تغيير اسم الموقع:</label>
+        <input type="text" id="newSiteName" placeholder="الاسم الجديد">
+        <button class="btn btn-blue" onclick="updateSiteName()">حفظ الاسم الجديد</button>
     </div>
+    <div style="background: #eee; padding: 10px; border-radius: 8px;">
+        <label>تغيير كلمة سر الناشر:</label>
+        <input type="text" id="newPubPass" placeholder="الباسورد الجديد">
+        <button class="btn btn-blue" onclick="updatePass('publisher', 'newPubPass')">تحديث كلمة سر الناشر</button>
+    </div>
+    <hr>
+    <button class="btn btn-red" onclick="location.reload()">تسجيل خروج</button>
 </div>
+
+<div class="news-feed" id="newsFeed"></div>
 
 <script>
-    const SECRET_PASS = "2009257ma";
+    // إعدادات مشروعك
+    const firebaseConfig = {
+        databaseURL: "https://mahmodya-73e03-default-rtdb.firebaseio.com",
+        projectId: "mahmodya-73e03",
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
 
-    // وظيفة طلب الباسورد
-    async function askForPass() {
-        const { value: password } = await Swal.fire({
-            title: 'منطقة الناشرين',
+    let currentRole = ""; // لتحديد إذا كان المالك فاتح أم لا
+
+    // جلب الإعدادات (الاسم وكلمات السر) من فايربيز عند الفتح
+    db.ref('settings').on('value', (snapshot) => {
+        const settings = snapshot.val();
+        if (settings) {
+            document.getElementById('displaySiteName').innerText = settings.siteName || "المحمودية مدينتي 🏠";
+            document.getElementById('siteTitleTag').innerText = settings.siteName || "المحمودية مدينتي";
+        }
+    });
+
+    async function loginSystem() {
+        const { value: pass } = await Swal.fire({
+            title: 'دخول النظام',
             input: 'password',
-            inputLabel: 'أدخل كلمة مرور الفريق',
-            inputPlaceholder: 'كلمة السر هنا...',
+            inputPlaceholder: 'أدخل كلمة السر',
             confirmButtonText: 'دخول'
         });
 
-        if (password === SECRET_PASS) {
-            document.getElementById('publisher-panel').style.display = 'block';
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-            Swal.fire('أهلاً بك', 'يمكنك الآن نشر الأخبار', 'success');
-        } else if (password) {
-            Swal.fire('خطأ', 'كلمة السر غلط يا مهند!', 'error');
-        }
+        // جلب كلمات السر الحالية من الداتابيز
+        db.ref('settings').once('value', (snapshot) => {
+            const settings = snapshot.val();
+            const ownerPass = "2009257mama"; // كلمة سر المالك (ثابتة للأمان)
+            const pubPass = settings?.pubPass || "2009257ma"; // كلمة سر الناشر
+
+            if (pass === ownerPass) {
+                currentRole = "owner";
+                document.getElementById('owner-panel').style.display = 'block';
+                document.getElementById('publisher-panel').style.display = 'block';
+                document.querySelectorAll('.delete-btn').forEach(b => b.style.display = 'block');
+                Swal.fire('أهلاً يا مالك', 'لديك كامل الصلاحيات', 'success');
+            } else if (pass === pubPass) {
+                currentRole = "publisher";
+                document.getElementById('publisher-panel').style.display = 'block';
+                document.getElementById('owner-panel').style.display = 'none';
+                Swal.fire('أهلاً يا ناشر', 'يمكنك النشر فقط', 'success');
+            } else if (pass) {
+                Swal.fire('خطأ', 'كلمة السر غير صحيحة', 'error');
+            }
+        });
     }
 
-    // وظيفة النشر (محاكاة - سيحتاج Firebase للحفظ الدائم)
     function publishNow() {
         const title = document.getElementById('postTitle').value;
         const text = document.getElementById('postText').value;
-        const imgInput = document.getElementById('postImage');
-        
-        if (!title || !text) return Swal.fire('تنبيه', 'كمل البيانات الأول', 'warning');
+        if(!title || !text) return Swal.fire('نقص بيانات', 'اكتب الخبر الأول', 'warning');
 
-        // تحويل الصورة لرابط مؤقت للعرض
-        let imgUrl = "https://via.placeholder.com/600x300?text=No+Image";
-        if (imgInput.files && imgInput.files[0]) {
-            imgUrl = URL.createObjectURL(imgInput.files[0]);
-        }
-
-        const newPost = `
-            <div class="news-card">
-                <img src="${imgUrl}">
-                <div class="news-content">
-                    <h2>${title}</h2>
-                    <p>${text}</p>
-                    <span class="news-time">الآن</span>
-                </div>
-            </div>
-        `;
-
-        // إضافة الخبر في الأعلى
-        const feed = document.getElementById('newsFeed');
-        feed.insertAdjacentHTML('afterbegin', newPost);
-
-        // تنظيف الخانات
-        document.getElementById('postTitle').value = "";
-        document.getElementById('postText').value = "";
-        Swal.fire('تم النشر', 'الخبر ظهر للجميع الآن', 'success');
+        db.ref('news_posts').push({
+            title: title,
+            content: text,
+            time: new Date().toLocaleString('ar-EG')
+        }).then(() => {
+            Swal.fire('تم النشر', '', 'success');
+            document.getElementById('postTitle').value = "";
+            document.getElementById('postText').value = "";
+        });
     }
-</script>
 
+    // وظائف المالك
+    function updateSiteName() {
+        const newName = document.getElementById('newSiteName').value;
+        if(newName) db.ref('settings').update({ siteName: newName });
+    }
+
+    function updatePass(role, inputId) {
+        const newP = document.getElementById(inputId).value;
+        if(newP) db.ref('settings').update({ pubPass: newP }).then(() => Swal.fire('تم تغيير كلمة سر الناشر'));
+    }
+
+    function deletePost(key) {
+        if(currentRole === "owner") {
+            Swal.fire({
+                title: 'حذف الخبر؟',
+                showCancelButton: true,
+                confirmButtonText: 'نعم، احذف'
+            }).then((res) => {
+                if(res.isConfirmed) db.ref('news_posts').child(key).remove();
+            });
+        }
+    }
+
+    // عرض الأخبار
+    db.ref('news_posts').on('value', (snapshot) => {
+        const newsFeed = document.getElementById('newsFeed');
+        newsFeed.innerHTML = "";
+        snapshot.forEach((child) => {
+            const news = child.val();
+            const key = child.key;
+            const postHtml = `
+                <div class="news-card">
+                    <button class="delete-btn" style="display: ${currentRole==='owner'?'block':'none'}" onclick="deletePost('${key}')">حذف 🗑️</button>
+                    <div class="news-content">
+                        <h2>${news.title}</h2>
+                        <p>${news.content}</p>
+                        <span class="news-time">${news.time}</span>
+                    </div>
+                </div>
+            `;
+            newsFeed.insertAdjacentHTML('afterbegin', postHtml);
+        });
+    });
+</script>
 </body>
 </html>
