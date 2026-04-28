@@ -13,7 +13,6 @@
     <style>
         :root {
             --primary: #1a73e8;
-            --owner: #000000;
             --bg: #f0f2f5;
             --card: #ffffff;
             --text: #1c1e21;
@@ -27,87 +26,97 @@
         header { background: #fff; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 1000; }
         .logo-box { display: flex; align-items: center; gap: 10px; }
         #siteLogo { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary); }
-        .site-name { font-weight: 900; font-size: 1.2rem; color: var(--primary); }
 
+        /* شريط الأخبار العاجلة للمالك */
+        .breaking-news { background: var(--accent); color: white; padding: 5px 0; font-size: 14px; display: none; }
+        
+        .container { max-width: 700px; margin: 0 auto; padding-bottom: 100px; }
         .page { display: none; min-height: 100vh; padding: 15px; width: 100%; }
         .page.active { display: block; }
-        .container { max-width: 700px; margin: 0 auto; padding-bottom: 100px; }
 
-        .news-card { background: var(--card); border-radius: 12px; margin-bottom: 15px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); overflow: hidden; animation: fadeIn 0.4s ease; position: relative; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .news-card { background: var(--card); border-radius: 12px; margin-bottom: 15px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); overflow: hidden; position: relative; }
         
         .card-header { padding: 12px; display: flex; align-items: center; gap: 10px; }
-        .author-img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; background: #eee; border: 1px solid #ddd; }
+        .author-img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 1px solid #ddd; }
         
-        /* تمييز النجم محدد بقلم أصفر */
-        .star-badge { background: var(--star-gold); color: #000; padding: 2px 8px; border-radius: 4px; font-weight: bold; box-shadow: 0 0 10px rgba(255, 235, 59, 0.6); }
-        .verify-icon { color: #1da1f2; font-size: 0.9rem; margin-right: 4px; }
+        /* تأثير النجم */
+        .star-badge { 
+            background: var(--star-gold); 
+            color: #000; 
+            padding: 2px 10px; 
+            border-radius: 6px; 
+            font-weight: 900; 
+            box-shadow: 0 0 15px rgba(255, 235, 59, 0.8);
+            border: 1px solid #ffd700;
+        }
+        .owner-pic-glow { border: 2px solid var(--star-gold); box-shadow: 0 0 10px var(--star-gold); }
 
         .news-img { width: 100%; max-height: 400px; object-fit: cover; cursor: pointer; }
-        .news-body { padding: 15px; }
-        .news-body h3 { margin: 0 0 10px 0; font-size: 1.1rem; line-height: 1.4; }
-        .news-body p { margin: 0; color: #4b4f56; font-size: 0.95rem; line-height: 1.5; white-space: pre-wrap; }
-
-        /* زرار إضافي داخل الخبر */
         .post-cta-btn { display: block; background: var(--primary); color: #fff !important; text-align: center; padding: 12px; margin: 0 15px 15px; border-radius: 8px; text-decoration: none; font-weight: bold; }
-
-        .card-actions { display: flex; border-top: 1px solid #eee; padding: 5px; justify-content: space-around; }
-        .action-btn { flex: 1; padding: 10px; text-align: center; color: #606770; font-size: 14px; font-weight: 600; cursor: pointer; }
 
         .admin-panel { background: #1c1c1e; color: #fff; border-radius: 15px; padding: 20px; margin-bottom: 20px; }
         .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
         .stat-item { background: #2c2c2e; padding: 15px; border-radius: 12px; text-align: center; border: 1px solid #3a3a3c; }
         .stat-item b { display: block; font-size: 1.5rem; color: var(--accent); }
 
-        input, textarea { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 10px; outline: none; font-family: inherit; }
+        input, textarea { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 10px; outline: none; }
         .btn { border: none; padding: 12px; border-radius: 10px; font-weight: bold; cursor: pointer; width: 100%; transition: 0.3s; }
         .btn-blue { background: var(--primary); color: white; }
         .btn-accent { background: var(--accent); color: white; }
-        
-        .delete-btn { position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.6); color: #fff; border-radius: 50%; width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; z-index: 10; }
 
         .bottom-nav { position: fixed; bottom: 0; width: 100%; background: #fff; display: flex; justify-content: space-around; padding: 10px; border-top: 1px solid #ddd; z-index: 1000; }
-        .nav-item { color: #606770; text-align: center; font-size: 20px; flex: 1; }
+        .nav-item { color: #606770; font-size: 20px; flex: 1; text-align: center; }
         .nav-item.active { color: var(--primary); }
 
-        .publisher-item { display: flex; align-items: center; justify-content: space-between; padding: 10px; background: #f8f9fa; margin-bottom: 8px; border-radius: 10px; color: #000; }
+        /* ستايل قائمة المعلنين القوية */
+        .pub-row { background: #f8f9fa; padding: 10px; border-radius: 10px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #eee; }
+        .pub-meta { display: flex; align-items: center; gap: 10px; }
     </style>
 </head>
 <body>
 
+<div class="breaking-news" id="alertBar">
+    <marquee id="alertText">أهلاً بكم في المنصة الرسمية لأخبار المحمودية</marquee>
+</div>
+
 <header>
-    <div class="logo-box">
-        <img id="siteLogo" src="">
-        <span class="site-name" id="siteNameDisplay">المحمودية</span>
-    </div>
-    <div id="auth-zone">
-        <i class="fas fa-user-circle fa-2x" style="color: #606770; cursor: pointer;" onclick="startLogin()"></i>
-    </div>
+    <div class="logo-box"><img id="siteLogo" src=""><span class="site-name" id="siteNameDisplay">المحمودية</span></div>
+    <div id="auth-zone"><i class="fas fa-user-circle fa-2x" style="color: #606770; cursor: pointer;" onclick="startLogin()"></i></div>
 </header>
 
-<div id="page-feed" class="page active">
-    <div class="container" id="news-feed"></div>
-</div>
+<div id="page-feed" class="page active"><div class="container" id="news-feed"></div></div>
 
 <div id="page-admin" class="page">
     <div class="container">
         <div class="admin-panel">
-            <h3><i class="fas fa-crown"></i> لوحة المالك</h3>
+            <h3><i class="fas fa-bolt" style="color:yellow"></i> قوى المالك</h3>
             <div class="stat-grid">
                 <div class="stat-item"><span id="stat-v">0</span><b>زائر</b></div>
                 <div class="stat-item"><span id="stat-views">0</span><b>مشاهدة</b></div>
             </div>
+            
+            <p>📢 شريط الإعلانات العلوية:</p>
+            <input type="text" id="siteAlert" placeholder="اكتب خبر عاجل يظهر للكل..">
+            
+            <p>⚙️ إعدادات الهوية:</p>
             <input type="text" id="setSiteName" placeholder="اسم الموقع">
             <input type="text" id="setLogo" placeholder="رابط اللوجو">
-            <input type="text" id="setOwnerPic" placeholder="رابط صورتك الشخصية">
-            <button class="btn btn-accent" onclick="updateSettings()">حفظ التعديلات</button>
+            
+            <div style="margin:10px 0;">
+                <label class="btn btn-blue" style="display:block; text-align:center">
+                    <i class="fas fa-camera"></i> تغيير صورتك الشخصية (المالك)
+                    <input type="file" hidden accept="image/*" onchange="uploadOwnerPic(this)">
+                </label>
+            </div>
+
+            <button class="btn btn-accent" onclick="updateSettings()">حفظ وتحديث المنصة</button>
         </div>
-        
+
         <div class="admin-panel" style="background: #fff; color: #000;">
-            <h4><i class="fas fa-users"></i> قائمة المعلنين بالترتيب:</h4>
+            <h4><i class="fas fa-user-shield"></i> التحكم بالمعلنين</h4>
             <div id="all-publishers-list"></div>
             <hr>
-            <h4>أخبار بانتظار الموافقة:</h4>
+            <h4><i class="fas fa-clock"></i> طلبات النشر المعلقة</h4>
             <div id="pending-posts"></div>
         </div>
         <button class="btn" style="background:#ff4d4d; color:white; margin-bottom: 100px;" onclick="doLogout()">تسجيل خروج</button>
@@ -117,23 +126,23 @@
 <div id="page-add" class="page">
     <div class="container">
         <div class="news-card" style="padding:20px;">
-            <h3>إنشاء منشور جديد</h3>
-            <input type="text" id="postTitle" placeholder="عنوان الخبر..">
-            <textarea id="postContent" rows="5" placeholder="ماذا يدور في المحمودية؟"></textarea>
+            <h3>إنشاء منشور احترافي</h3>
+            <input type="text" id="postTitle" placeholder="عنوان الخبر الصاعق..">
+            <textarea id="postContent" rows="5" placeholder="اكتب تفاصيل الخبر هنا.."></textarea>
             
             <img id="img-preview" style="width:100%; border-radius:10px; display:none; margin-bottom:10px;">
             <input type="file" id="file-input" accept="image/*" style="display:none" onchange="previewImage(this)">
+            
             <button class="btn" style="background:#e4e6eb; color:#000; margin-bottom:10px;" onclick="document.getElementById('file-input').click()">
-                <i class="fas fa-image"></i> إرفاق صورة
+                <i class="fas fa-image"></i> إرفاق صورة الخبر
             </button>
 
             <div style="background:#f0f2f5; padding:10px; border-radius:10px; margin-bottom:10px;">
-                <p style="margin:0 0 5px 0; font-size:13px; font-weight:bold;">إضافة زرار مضغوط (اختياري):</p>
-                <input type="text" id="ctaText" placeholder="نص الزرار">
-                <input type="text" id="ctaLink" placeholder="رابط الزرار (https://...)">
+                <input type="text" id="ctaText" placeholder="نص الزرار (مثال: تواصل معنا)">
+                <input type="text" id="ctaLink" placeholder="رابط الزرار (واتساب، فيسبوك، إلخ)">
             </div>
             
-            <button class="btn btn-blue" onclick="publishPost()">نشر الآن</button>
+            <button class="btn btn-blue" id="btnPublish" onclick="publishPost()">إطلاق المنشور الآن</button>
         </div>
     </div>
 </div>
@@ -151,9 +160,9 @@
     const db = firebase.database();
 
     let user = JSON.parse(localStorage.getItem('mahmoudya_user'));
-    let base64Img = "";
+    let tempImg = "";
+    let tempProfileImg = "";
 
-    // دالة حساب الوقت النسبي (منذ ثانية، منذ 10 د، منذ 5 س، منذ 1 يوم)
     function timeAgo(date) {
         const seconds = Math.floor((new Date() - date) / 1000);
         if (seconds < 60) return `منذ ${seconds} ث`;
@@ -161,55 +170,77 @@
         if (minutes < 60) return `منذ ${minutes} د`;
         const hours = Math.floor(minutes / 60);
         if (hours < 24) return `منذ ${hours} س`;
-        const days = Math.floor(hours / 24);
-        return `منذ ${days} يوم`;
+        return `منذ ${Math.floor(hours/24)} يوم`;
     }
 
-    window.onload = () => {
-        trackVisit();
-        loadSettings();
-        loadFeed();
-        if(user) applyPermissions();
-    };
+    window.onload = () => { trackVisit(); loadSettings(); loadFeed(); if(user) applyPermissions(); };
 
     function loadSettings() {
         db.ref('settings').on('value', s => {
             const d = s.val() || {};
             document.getElementById('siteNameDisplay').innerText = d.name || "المحمودية";
-            document.getElementById('siteLogo').src = d.logo || "https://cdn-icons-png.flaticon.com/512/21/21601.png";
+            document.getElementById('siteLogo').src = d.logo || "";
+            if(d.alert) {
+                document.getElementById('alertBar').style.display = 'block';
+                document.getElementById('alertText').innerText = d.alert;
+            }
             if(user?.role === 'owner') {
+                document.getElementById('siteAlert').value = d.alert || "";
                 document.getElementById('setSiteName').value = d.name || "";
                 document.getElementById('setLogo').value = d.logo || "";
-                document.getElementById('setOwnerPic').value = d.ownerPic || "";
             }
         });
     }
 
     async function startLogin() {
         if(user) return switchPage(user.role === 'owner' ? 'page-admin' : 'page-add');
-        const { value: pass } = await Swal.fire({ title: 'رمز الدخول', input: 'password' });
+        const { value: pass } = await Swal.fire({ title: 'أدخل رمز العبور', input: 'password', confirmButtonText: 'دخول' });
         
         if (pass === "2009257mama") {
             db.ref('settings/ownerPic').once('value', s => {
                 saveUser({ role: 'owner', name: 'النجم', pic: s.val() || '' });
             });
         } else if (pass === "2009257ma") {
-            const { value: f } = await Swal.fire({
-                title: 'انضمام معلن',
-                html: '<input id="n" class="swal2-input" placeholder="الاسم"><input id="p" class="swal2-input" placeholder="رقم الموبايل"><input id="pic" class="swal2-input" placeholder="رابط صورتك الشخصية">',
-                preConfirm: () => [document.getElementById('n').value, document.getElementById('p').value, document.getElementById('pic').value]
-            });
-            if(f) handleRequest(f[0], f[1], f[2]);
+            showPublisherSignup();
+        }
+    }
+
+    async function showPublisherSignup() {
+        const { value: file } = await Swal.fire({
+            title: 'طلب انضمام معلن',
+            html: `
+                <input id="sw_n" class="swal2-input" placeholder="الاسم الكامل">
+                <input id="sw_p" class="swal2-input" placeholder="رقم الموبايل">
+                <p style="font-size:12px; margin-top:10px;">اختر صورتك الشخصية:</p>
+                <input type="file" id="sw_pic" class="swal2-file" accept="image/*">
+            `,
+            preConfirm: () => {
+                const f = document.getElementById('sw_pic').files[0];
+                return [document.getElementById('sw_n').value, document.getElementById('sw_p').value, f];
+            }
+        });
+
+        if(file && file[0] && file[1]) {
+            if(file[2]) {
+                const reader = new FileReader();
+                reader.onload = (e) => handleRequest(file[0], file[1], e.target.result);
+                reader.readAsDataURL(file[2]);
+            } else {
+                handleRequest(file[0], file[1], "");
+            }
         }
     }
 
     function handleRequest(n, ph, pi) {
-        db.ref('approved_publishers').child(ph).once('value', s => {
-            if(s.exists()) saveUser({ role: 'publisher', name: n, phone: ph, pic: pi });
-            else {
-                db.ref('pending_publishers').child(ph).set({ name: n, phone: ph, pic: pi });
-                Swal.fire('تم الإرسال', 'انتظر موافقة النجم', 'info');
-            }
+        db.ref('banned').child(ph).once('value', b => {
+            if(b.exists()) return Swal.fire('محظور', 'تم حظرك من المنصة', 'error');
+            db.ref('approved_publishers').child(ph).once('value', s => {
+                if(s.exists()) saveUser({ role: 'publisher', name: n, phone: ph, pic: pi || s.val().pic });
+                else {
+                    db.ref('pending_publishers').child(ph).set({ name: n, phone: ph, pic: pi });
+                    Swal.fire('تم الإرسال', 'انتظر موافقة النجم لتفعيل حسابك', 'success');
+                }
+            });
         });
     }
 
@@ -222,8 +253,16 @@
             reader.onload = (e) => { 
                 document.getElementById('img-preview').src = e.target.result;
                 document.getElementById('img-preview').style.display = 'block';
-                base64Img = e.target.result;
-            }
+                tempImg = e.target.result;
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    function uploadOwnerPic(input) {
+        if (input.files && input.files[0]) {
+            let reader = new FileReader();
+            reader.onload = (e) => { tempProfileImg = e.target.result; Swal.fire('تم اختيار الصورة، اضغط حفظ التعديلات'); };
             reader.readAsDataURL(input.files[0]);
         }
     }
@@ -231,17 +270,17 @@
     function publishPost() {
         const t = document.getElementById('postTitle').value;
         const c = document.getElementById('postContent').value;
-        if(!t || !c) return Swal.fire('خطأ', 'اكمل البيانات');
+        if(!t || !c) return Swal.fire('خطأ', 'أكمل بيانات الخبر');
 
+        document.getElementById('btnPublish').disabled = true;
         db.ref('posts').push({
-            title: t, content: c, img: base64Img,
+            title: t, content: c, img: tempImg,
             ctaText: document.getElementById('ctaText').value,
             ctaLink: document.getElementById('ctaLink').value,
             author: user.name, authorPic: user.pic || '',
-            role: user.role,
-            status: user.role === 'owner' ? 'approved' : 'pending',
+            role: user.role, status: user.role === 'owner' ? 'approved' : 'pending',
             views: 0, time: Date.now()
-        }).then(() => { Swal.fire('تم بالنشر'); switchPage('page-feed'); });
+        }).then(() => { Swal.fire('تم النشر بنجاح'); switchPage('page-feed'); });
     }
 
     function loadFeed() {
@@ -251,19 +290,18 @@
             let posts = [];
             s.forEach(child => {
                 let p = child.val(); p.key = child.key;
-                if(p.status === 'approved' || (user && user.role === 'owner')) posts.push(p);
+                if(p.status === 'approved' || (user?.role === 'owner')) posts.push(p);
             });
-
             posts.reverse().forEach(p => {
                 const isOwner = p.role === 'owner';
                 feed.innerHTML += `
                     <div class="news-card">
-                        ${user?.role === 'owner' ? `<div class="delete-btn" onclick="deletePost('${p.key}')"><i class="fas fa-trash"></i></div>` : ''}
+                        ${user?.role === 'owner' ? `<div class="delete-btn" style="position:absolute;left:10px;top:10px;color:red" onclick="deletePost('${p.key}')"><i class="fas fa-trash"></i></div>` : ''}
                         <div class="card-header">
-                            <img src="${p.authorPic || 'https://cdn-icons-png.flaticon.com/512/149/149071.png'}" class="author-img">
+                            <img src="${p.authorPic || 'https://cdn-icons-png.flaticon.com/512/149/149071.png'}" class="author-img ${isOwner ? 'owner-pic-glow' : ''}">
                             <div>
                                 <span class="${isOwner ? 'star-badge' : ''}">${p.author}</span>
-                                ${isOwner ? '<i class="fas fa-check-circle verify-icon"></i>' : ''}
+                                ${isOwner ? '<i class="fas fa-check-circle" style="color:#1da1f2;margin-right:5px"></i>' : ''}
                                 <br><small style="color:gray">${timeAgo(p.time)}</small>
                             </div>
                         </div>
@@ -271,8 +309,8 @@
                         <div class="news-body"><h3>${p.title}</h3><p>${p.content}</p></div>
                         ${(p.ctaText && p.ctaLink) ? `<a href="${p.ctaLink}" target="_blank" class="post-cta-btn">${p.ctaText}</a>` : ''}
                         <div class="card-actions">
-                            <div class="action-btn"><i class="far fa-thumbs-up"></i> إعجاب</div>
-                            <div class="action-btn" onclick="sharePost('${p.title}')"><i class="far fa-share-square"></i> مشاركة</div>
+                            <div class="action-btn"><i class="far fa-thumbs-up"></i></div>
+                            <div class="action-btn" onclick="sharePost('${p.title}')"><i class="fas fa-share"></i></div>
                             <div class="action-btn"><i class="far fa-eye"></i> ${p.views || 0}</div>
                         </div>
                     </div>`;
@@ -293,16 +331,19 @@
             const list = document.getElementById('all-publishers-list');
             list.innerHTML = "";
             s.forEach(c => {
-                list.innerHTML += `<div class="publisher-item">
-                    <span><img src="${c.val().pic || ''}" style="width:25px;height:25px;border-radius:50%;vertical-align:middle"> <b>${c.val().name}</b> (${c.key})</span>
-                    <button onclick="removePub('${c.key}')" style="color:red; background:none; border:none"><i class="fas fa-trash"></i></button>
+                list.innerHTML += `<div class="pub-row">
+                    <div class="pub-meta">
+                        <img src="${c.val().pic || ''}" style="width:30px;height:30px;border-radius:50%">
+                        <span><b>${c.val().name}</b></span>
+                    </div>
+                    <button onclick="banPub('${c.key}')" style="color:red; background:none; border:none"><i class="fas fa-user-slash"></i> حظر</button>
                 </div>`;
             });
         });
         db.ref('pending_publishers').on('value', s => {
             s.forEach(c => {
-                document.getElementById('all-publishers-list').innerHTML += `<div class="publisher-item" style="border:1px solid blue">
-                    <span>طلب جديد: ${c.val().name}</span>
+                document.getElementById('all-publishers-list').innerHTML += `<div class="pub-row" style="border:1px solid gold">
+                    <span>طلب: ${c.val().name}</span>
                     <button onclick="approvePub('${c.val().name}','${c.key}','${c.val().pic}')" class="btn-blue" style="width:auto; padding:5px">قبول</button>
                 </div>`;
             });
@@ -312,8 +353,8 @@
             s.forEach(c => {
                 total += (c.val().views || 0);
                 if(c.val().status === 'pending') {
-                    pend.innerHTML += `<div style="background:#f9f9f9; padding:10px; border-radius:10px; margin-bottom:5px;">
-                        <b>${c.val().title}</b><br><button onclick="approvePost('${c.key}')" class="btn-blue" style="width:auto; padding:5px 10px;">نشر</button>
+                    pend.innerHTML += `<div style="background:#f0f2f5; padding:10px; border-radius:10px; margin-bottom:5px;">
+                        <b>${c.val().title}</b> <button onclick="approvePost('${c.key}')" class="btn-blue" style="width:auto; padding:3px 8px;">نشر ✅</button>
                     </div>`;
                 }
             });
@@ -321,24 +362,25 @@
         });
     }
 
-    function approvePost(k) { db.ref('posts').child(k).update({status: 'approved'}); }
+    function banPub(ph) { if(confirm('هل تريد حظر هذا المعلن نهائياً؟')) { db.ref('banned').child(ph).set(true); db.ref('approved_publishers').child(ph).remove(); } }
     function approvePub(n, ph, pi) { db.ref('approved_publishers').child(ph).set({name: n, pic: pi}).then(()=>db.ref('pending_publishers').child(ph).remove()); }
-    function removePub(ph) { if(confirm('حذف هذا المعلن؟')) db.ref('approved_publishers').child(ph).remove(); }
+    function approvePost(k) { db.ref('posts').child(k).update({status: 'approved'}); }
     function deletePost(k) { if(confirm('حذف نهائي؟')) db.ref('posts').child(k).remove(); }
     function incView(k) { db.ref('posts').child(k).child('views').transaction(v => (v || 0) + 1); }
-    function switchPage(id) {
-        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
-    }
+    function switchPage(id) { document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); document.getElementById(id).classList.add('active'); }
     function checkAddAccess() { user ? switchPage('page-add') : startLogin(); }
     function trackVisit() { const vid = localStorage.getItem('v_id') || 'v_' + Math.random().toString(36).substr(2, 9); localStorage.setItem('v_id', vid); db.ref('analytics/visitors').child(vid).set(true); }
+    
     function updateSettings() {
-        const n = document.getElementById('setSiteName').value;
-        const l = document.getElementById('setLogo').value;
-        const p = document.getElementById('setOwnerPic').value;
-        db.ref('settings').update({ name: n, logo: l, ownerPic: p }).then(() => Swal.fire('تم الحفظ'));
+        const updates = {
+            name: document.getElementById('setSiteName').value,
+            logo: document.getElementById('setLogo').value,
+            alert: document.getElementById('siteAlert').value
+        };
+        if(tempProfileImg) updates.ownerPic = tempProfileImg;
+        db.ref('settings').update(updates).then(() => Swal.fire('تم تحديث المنصة بنجاح'));
     }
-    function sharePost(title) { if (navigator.share) { navigator.share({ title: title, url: window.location.href }); } else { Swal.fire('نسخ الرابط', 'تم نسخ رابط الموقع', 'success'); } }
+    function sharePost(title) { if (navigator.share) { navigator.share({ title: title, url: window.location.href }); } else { Swal.fire('نسخ الرابط', 'تم نسخ الرابط', 'success'); } }
 </script>
 </body>
 </html>
