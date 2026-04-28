@@ -9,19 +9,20 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         :root { --main-blue: #004a99; --bg: #f0f2f5; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding-bottom: 50px; }
-        header { background: var(--main-blue); color: white; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding-bottom: 20px; }
+        header { background: var(--main-blue); color: white; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
         .admin-trigger { background: rgba(255,255,255,0.2); padding: 5px 15px; border-radius: 5px; cursor: pointer; font-size: 14px; }
         .panel { background: white; max-width: 600px; margin: 20px auto; padding: 20px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); display: none; }
-        .input-group { margin-bottom: 15px; }
-        input, textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; margin-top: 5px; }
-        .btn { border: none; padding: 12px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        input, textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; margin-top: 5px; margin-bottom: 10px; }
+        .btn { border: none; padding: 12px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; }
         .btn-blue { background: var(--main-blue); color: white; }
-        .btn-red { background: #d32f2f; color: white; }
         .news-feed { max-width: 600px; margin: 20px auto; padding: 0 10px; }
         .news-card { background: white; border-radius: 10px; margin-bottom: 20px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.05); position: relative; }
+        .news-card img { width: 100%; max-height: 350px; object-fit: cover; }
         .news-content { padding: 15px; }
-        .delete-btn { position: absolute; top: 10px; left: 10px; background: red; color: white; border: none; border-radius: 5px; cursor: pointer; padding: 5px; font-size: 12px; display: none; }
+        .news-time { font-size: 12px; color: #888; }
+        footer { text-align: center; padding: 20px; color: #777; font-size: 14px; }
+        .delete-btn { position: absolute; top: 10px; left: 10px; background: red; color: white; border: none; border-radius: 5px; cursor: pointer; padding: 5px 10px; z-index: 10; display: none; }
     </style>
 </head>
 <body>
@@ -32,32 +33,27 @@
 </header>
 
 <div id="publisher-panel" class="panel">
-    <h3>نشر خبر جديد (ناشر) 📝</h3>
+    <h3>نشر خبر بصورة 📸</h3>
     <input type="text" id="postTitle" placeholder="عنوان الخبر">
-    <textarea id="postText" rows="4" placeholder="تفاصيل الخبر..."></textarea>
-    <button class="btn btn-blue" onclick="publishNow()">نشر الخبر</button>
+    <textarea id="postText" rows="3" placeholder="تفاصيل الخبر..."></textarea>
+    <input type="text" id="postImageUrl" placeholder="ضع رابط الصورة هنا (اختياري)">
+    <button class="btn btn-blue" onclick="publishNow()">نشر الآن</button>
 </div>
 
 <div id="owner-panel" class="panel">
     <h3>إعدادات المالك 👑</h3>
-    <div style="background: #eee; padding: 10px; border-radius: 8px; margin-bottom: 10px;">
-        <label>تغيير اسم الموقع:</label>
-        <input type="text" id="newSiteName" placeholder="الاسم الجديد">
-        <button class="btn btn-blue" onclick="updateSiteName()">حفظ الاسم الجديد</button>
-    </div>
-    <div style="background: #eee; padding: 10px; border-radius: 8px;">
-        <label>تغيير كلمة سر الناشر:</label>
-        <input type="text" id="newPubPass" placeholder="الباسورد الجديد">
-        <button class="btn btn-blue" onclick="updatePass('publisher', 'newPubPass')">تحديث كلمة سر الناشر</button>
-    </div>
+    <input type="text" id="newSiteName" placeholder="تغيير اسم الموقع">
+    <button class="btn btn-blue" onclick="updateSiteName()">حفظ الاسم</button>
     <hr>
-    <button class="btn btn-red" onclick="location.reload()">تسجيل خروج</button>
+    <input type="text" id="newPubPass" placeholder="كلمة سر ناشر جديدة">
+    <button class="btn btn-blue" onclick="updatePass()">تحديث كلمة السر وتسجيل خروج الكل</button>
 </div>
 
 <div class="news-feed" id="newsFeed"></div>
 
+<footer>جميع الحقوق محفوظة لدي النجم &copy; 2026</footer>
+
 <script>
-    // إعدادات مشروعك
     const firebaseConfig = {
         databaseURL: "https://mahmodya-73e03-default-rtdb.firebaseio.com",
         projectId: "mahmodya-73e03",
@@ -65,107 +61,116 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    let currentRole = ""; // لتحديد إذا كان المالك فاتح أم لا
+    let currentRole = "";
+    let currentPubPass = "2009257ma";
 
-    // جلب الإعدادات (الاسم وكلمات السر) من فايربيز عند الفتح
+    // جلب الإعدادات والتحقق من كلمة السر
     db.ref('settings').on('value', (snapshot) => {
         const settings = snapshot.val();
         if (settings) {
-            document.getElementById('displaySiteName').innerText = settings.siteName || "المحمودية مدينتي 🏠";
-            document.getElementById('siteTitleTag').innerText = settings.siteName || "المحمودية مدينتي";
+            document.getElementById('displaySiteName').innerText = settings.siteName || "المحمودية مدينتي";
+            if (currentPubPass !== settings.pubPass && currentRole === "publisher") {
+                location.reload(); // تسجيل خروج تلقائي للناشر لو تغيرت كلمة السر
+            }
+            currentPubPass = settings.pubPass || "2009257ma";
         }
     });
 
     async function loginSystem() {
         const { value: pass } = await Swal.fire({
-            title: 'دخول النظام',
+            title: 'دخول الناشرين',
             input: 'password',
-            inputPlaceholder: 'أدخل كلمة السر',
             confirmButtonText: 'دخول'
         });
 
-        // جلب كلمات السر الحالية من الداتابيز
-        db.ref('settings').once('value', (snapshot) => {
-            const settings = snapshot.val();
-            const ownerPass = "2009257mama"; // كلمة سر المالك (ثابتة للأمان)
-            const pubPass = settings?.pubPass || "2009257ma"; // كلمة سر الناشر
+        if (pass === "2009257mama") {
+            currentRole = "owner";
+            document.getElementById('owner-panel').style.display = 'block';
+            document.getElementById('publisher-panel').style.display = 'block';
+            Swal.fire('أهلاً يا مالك');
+        } else if (pass === currentPubPass) {
+            currentRole = "publisher";
+            document.getElementById('publisher-panel').style.display = 'block';
+            Swal.fire('أهلاً يا ناشر');
+        } else if (pass) {
+            Swal.fire('خطأ', 'كلمة السر غير صحيحة', 'error');
+        }
+    }
 
-            if (pass === ownerPass) {
-                currentRole = "owner";
-                document.getElementById('owner-panel').style.display = 'block';
-                document.getElementById('publisher-panel').style.display = 'block';
-                document.querySelectorAll('.delete-btn').forEach(b => b.style.display = 'block');
-                Swal.fire('أهلاً يا مالك', 'لديك كامل الصلاحيات', 'success');
-            } else if (pass === pubPass) {
-                currentRole = "publisher";
-                document.getElementById('publisher-panel').style.display = 'block';
-                document.getElementById('owner-panel').style.display = 'none';
-                Swal.fire('أهلاً يا ناشر', 'يمكنك النشر فقط', 'success');
-            } else if (pass) {
-                Swal.fire('خطأ', 'كلمة السر غير صحيحة', 'error');
-            }
-        });
+    // وظيفة الوقت الذكي
+    function timeAgo(date) {
+        const seconds = Math.floor((new Date() - date) / 1000);
+        if (seconds < 60) return "الآن";
+        const minutes = Math.floor(seconds / 60);
+        if (minutes < 60) return `منذ ${minutes} دقيقة`;
+        const hours = Math.floor(minutes / 60);
+        if (hours < 24) return `منذ ${hours} ساعة`;
+        return `منذ ${Math.floor(hours / 24)} يوم`;
     }
 
     function publishNow() {
         const title = document.getElementById('postTitle').value;
         const text = document.getElementById('postText').value;
-        if(!title || !text) return Swal.fire('نقص بيانات', 'اكتب الخبر الأول', 'warning');
+        const img = document.getElementById('postImageUrl').value;
+        if(!title || !text) return;
 
         db.ref('news_posts').push({
             title: title,
             content: text,
-            time: new Date().toLocaleString('ar-EG')
+            image: img,
+            timestamp: Date.now()
         }).then(() => {
-            Swal.fire('تم النشر', '', 'success');
             document.getElementById('postTitle').value = "";
             document.getElementById('postText').value = "";
+            document.getElementById('postImageUrl').value = "";
+            Swal.fire('تم النشر بنجاح');
         });
     }
 
-    // وظائف المالك
-    function updateSiteName() {
-        const newName = document.getElementById('newSiteName').value;
-        if(newName) db.ref('settings').update({ siteName: newName });
-    }
-
-    function updatePass(role, inputId) {
-        const newP = document.getElementById(inputId).value;
-        if(newP) db.ref('settings').update({ pubPass: newP }).then(() => Swal.fire('تم تغيير كلمة سر الناشر'));
-    }
-
-    function deletePost(key) {
-        if(currentRole === "owner") {
-            Swal.fire({
-                title: 'حذف الخبر؟',
-                showCancelButton: true,
-                confirmButtonText: 'نعم، احذف'
-            }).then((res) => {
-                if(res.isConfirmed) db.ref('news_posts').child(key).remove();
-            });
+    function updatePass() {
+        const newP = document.getElementById('newPubPass').value;
+        if(newP) {
+            db.ref('settings').update({ pubPass: newP });
+            Swal.fire('تم التغيير وسجل خروج جميع الناشرين');
         }
     }
 
-    // عرض الأخبار
-    db.ref('news_posts').on('value', (snapshot) => {
-        const newsFeed = document.getElementById('newsFeed');
-        newsFeed.innerHTML = "";
-        snapshot.forEach((child) => {
-            const news = child.val();
-            const key = child.key;
-            const postHtml = `
-                <div class="news-card">
-                    <button class="delete-btn" style="display: ${currentRole==='owner'?'block':'none'}" onclick="deletePost('${key}')">حذف 🗑️</button>
-                    <div class="news-content">
-                        <h2>${news.title}</h2>
-                        <p>${news.content}</p>
-                        <span class="news-time">${news.time}</span>
+    // عرض الأخبار وتحديث الوقت كل دقيقة
+    function loadNews() {
+        db.ref('news_posts').on('value', (snapshot) => {
+            const feed = document.getElementById('newsFeed');
+            feed.innerHTML = "";
+            snapshot.forEach((child) => {
+                const item = child.val();
+                const key = child.key;
+                const html = `
+                    <div class="news-card">
+                        ${currentRole === 'owner' ? `<button class="delete-btn" style="display:block" onclick="deleteP('${key}')">حذف</button>` : ''}
+                        ${item.image ? `<img src="${item.image}" onerror="this.style.display='none'">` : ''}
+                        <div class="news-content">
+                            <h2>${item.title}</h2>
+                            <p>${item.content}</p>
+                            <span class="news-time">${timeAgo(item.timestamp)}</span>
+                        </div>
                     </div>
-                </div>
-            `;
-            newsFeed.insertAdjacentHTML('afterbegin', postHtml);
+                `;
+                feed.insertAdjacentHTML('afterbegin', html);
+            });
         });
-    });
+    }
+
+    function deleteP(key) {
+        db.ref('news_posts').child(key).remove();
+    }
+
+    function updateSiteName() {
+        const n = document.getElementById('newSiteName').value;
+        if(n) db.ref('settings').update({ siteName: n });
+    }
+
+    loadNews();
+    setInterval(loadNews, 60000); // تحديث الوقت تلقائياً كل دقيقة
 </script>
+
 </body>
 </html>
