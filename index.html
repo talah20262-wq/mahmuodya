@@ -11,184 +11,109 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
-        :root {
-            --primary: #1a73e8;
-            --bg: #f0f2f5;
-            --card: #ffffff;
-            --text: #1c1e21;
-            --accent: #fe2c55;
-            --star-gold: #ffeb3b;
-        }
-
+        :root { --primary: #1a73e8; --bg: #f0f2f5; --card: #ffffff; --text: #1c1e21; --accent: #fe2c55; --star-gold: #ffeb3b; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
-        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); }
 
-        /* الهيدر */
         header { background: #fff; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 1000; }
         .logo-box { display: flex; align-items: center; gap: 10px; }
-        #siteLogo { width: 42px; height: 42px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary); background: #eee; }
-        .site-name { font-weight: 900; font-size: 1.3rem; color: var(--primary); letter-spacing: -0.5px; }
+        #siteLogo { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary); background: #eee; }
 
-        /* التنبيه العلوي */
-        #alertBar { background: var(--accent); color: white; padding: 6px 0; font-size: 14px; display: none; }
-
-        /* الحاوية والصفحات */
         .container { max-width: 700px; margin: 0 auto; padding: 15px 15px 100px; }
         .page { display: none; min-height: 100vh; }
-        .page.active { display: block; animation: fadeIn 0.3s ease; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .page.active { display: block; }
 
-        /* كارت الخبر */
-        .news-card { background: var(--card); border-radius: 15px; margin-bottom: 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.1); overflow: hidden; position: relative; border: 1px solid #e0e0e0; }
-        .card-header { padding: 12px 15px; display: flex; align-items: center; gap: 12px; }
-        .author-img { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; border: 1px solid #ddd; background: #f9f9f9; }
+        .news-card { background: var(--card); border-radius: 12px; margin-bottom: 15px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); overflow: hidden; position: relative; }
+        .card-header { padding: 12px; display: flex; align-items: center; gap: 10px; }
+        .author-img { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; border: 1px solid #ddd; }
         
-        /* تمييز المالك (النجم) */
-        .star-badge { background: var(--star-gold); color: #000; padding: 2px 10px; border-radius: 6px; font-weight: 900; font-size: 13px; box-shadow: 0 0 10px rgba(255, 235, 59, 0.4); }
-        .owner-glow { border: 2.5px solid var(--star-gold); box-shadow: 0 0 8px var(--star-gold); }
+        .star-badge { background: var(--star-gold); color: #000; padding: 2px 8px; border-radius: 5px; font-weight: bold; font-size: 12px; }
+        .owner-glow { border: 2px solid var(--star-gold); box-shadow: 0 0 8px var(--star-gold); }
 
-        .news-img { width: 100%; max-height: 500px; object-fit: cover; cursor: pointer; display: block; }
+        .news-img { width: 100%; max-height: 450px; object-fit: cover; cursor: pointer; }
         .news-body { padding: 15px; }
-        .news-body h3 { margin-bottom: 8px; font-size: 1.2rem; color: #050505; }
-        .news-body p { color: #4b4f56; font-size: 1rem; white-space: pre-wrap; }
 
-        /* الأزرار جنب بعض (تم الإصلاح) */
-        .card-actions { display: flex; border-top: 1px solid #f0f2f5; padding: 4px; background: #fff; }
-        .action-btn { flex: 1; padding: 10px 0; text-align: center; color: #606770; font-size: 14px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s; }
-        .action-btn:hover { background: #f2f2f2; border-radius: 6px; }
-        .action-btn i { font-size: 18px; }
+        /* الأزرار جنب بعض */
+        .card-actions { display: flex; border-top: 1px solid #eee; padding: 5px; }
+        .action-btn { flex: 1; padding: 10px; text-align: center; color: #606770; font-size: 14px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; }
+        .action-btn.liked { color: var(--primary); } /* اللون الأزرق عند اللايك */
 
-        /* لوحة التحكم */
-        .admin-panel { background: #1c1c1e; color: #fff; border-radius: 18px; padding: 22px; margin-bottom: 20px; }
-        .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 15px 0; }
-        .stat-item { background: #2c2c2e; padding: 15px; border-radius: 12px; text-align: center; border: 1px solid #3a3a3c; }
-        .stat-item b { display: block; font-size: 1.6rem; color: var(--accent); }
+        .admin-panel { background: #1c1c1e; color: #fff; border-radius: 15px; padding: 20px; margin-bottom: 20px; }
+        .publisher-item { background: #f8f9fa; padding: 12px; border-radius: 10px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; color: #000; border: 1px solid #ddd; }
 
-        input, textarea { width: 100%; padding: 14px; margin: 10px 0; border: 1px solid #ddd; border-radius: 12px; outline: none; font-size: 16px; background: #fff; }
-        .btn { border: none; padding: 14px; border-radius: 12px; font-weight: bold; cursor: pointer; width: 100%; transition: 0.3s; font-size: 16px; }
-        .btn-blue { background: var(--primary); color: white; }
-        .btn-accent { background: var(--accent); color: white; }
+        .bottom-nav { position: fixed; bottom: 0; width: 100%; background: #fff; display: flex; justify-content: space-around; padding: 12px; border-top: 1px solid #ddd; z-index: 1000; }
+        .nav-item { color: #606770; font-size: 22px; cursor: pointer; flex: 1; text-align: center; }
+        .nav-item.active { color: var(--primary); }
 
-        /* الناف بار السفلي */
-        .bottom-nav { position: fixed; bottom: 0; width: 100%; background: #fff; display: flex; justify-content: space-around; padding: 12px 0; border-top: 1px solid #ddd; z-index: 1000; box-shadow: 0 -2px 10px rgba(0,0,0,0.05); }
-        .nav-item { color: #606770; font-size: 24px; cursor: pointer; transition: 0.2s; flex: 1; text-align: center; }
-        .nav-item.active { color: var(--primary); transform: translateY(-3px); }
-
-        .delete-btn { position: absolute; top: 12px; left: 12px; background: rgba(0,0,0,0.5); color: #fff; border-radius: 50%; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; z-index: 10; cursor: pointer; }
-        .publisher-row { background: #f8f9fa; padding: 12px; border-radius: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; color: #000; }
+        .delete-btn { position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.5); color: #fff; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 5; }
     </style>
 </head>
 <body>
 
-<div id="alertBar"><marquee id="alertText"></marquee></div>
-
 <header>
-    <div class="logo-box">
-        <img id="siteLogo" src="https://cdn-icons-png.flaticon.com/512/1043/1043514.png">
-        <span class="site-name" id="siteNameDisplay">المحمودية</span>
-    </div>
+    <div class="logo-box"><img id="siteLogo" src=""><span class="site-name" id="siteNameDisplay">المحمودية</span></div>
     <div onclick="startLogin()"><i class="fas fa-user-circle fa-2x" style="color: #606770; cursor: pointer;"></i></div>
 </header>
 
-<div id="page-feed" class="page active">
-    <div class="container" id="news-feed"></div>
-</div>
+<div id="page-feed" class="page active"><div class="container" id="news-feed"></div></div>
 
 <div id="page-admin" class="page">
     <div class="container">
         <div class="admin-panel">
-            <h3><i class="fas fa-user-shield" style="color:var(--star-gold)"></i> لوحة المالك (النجم)</h3>
-            <div class="stat-grid">
-                <div class="stat-item"><span id="stat-v">0</span><b>زائر</b></div>
-                <div class="stat-item"><span id="stat-views">0</span><b>مشاهدة</b></div>
-            </div>
-            
-            <label>اسم المنصة:</label>
-            <input type="text" id="setSiteName" placeholder="مثال: أخبار المحمودية">
-            
-            <label>رابط اللوجو:</label>
-            <input type="text" id="setLogo" placeholder="رابط صورة اللوجو">
-            
-            <label>شريط التنبيهات:</label>
-            <input type="text" id="siteAlert" placeholder="رسالة تظهر في الأعلى">
-
-            <div style="background: #2c2c2e; padding: 15px; border-radius: 12px; margin: 10px 0;">
-                <p style="margin-bottom:8px">تغيير صورتك الشخصية (النجم):</p>
-                <input type="file" accept="image/*" onchange="handleFileSelect(this, 'owner')">
-            </div>
-
-            <button class="btn btn-accent" onclick="updateSettings()">حفظ وتحديث كل شيء</button>
+            <h3><i class="fas fa-tools"></i> تحكم النجم</h3>
+            <div id="stats" style="margin:10px 0; font-size:14px; color:#aaa"></div>
+            <input type="text" id="setSiteName" placeholder="اسم الموقع">
+            <input type="text" id="setLogo" placeholder="رابط اللوجو">
+            <input type="file" accept="image/*" onchange="uploadOwnerPic(this)" style="margin-top:10px">
+            <button class="btn" style="background:var(--primary); color:white; width:100%; padding:10px; border-radius:10px; margin-top:10px" onclick="updateSettings()">حفظ التعديلات</button>
         </div>
 
-        <div class="admin-panel" style="background: #fff; color: #000;">
-            <h4 style="margin-bottom:15px">إدارة المعلنين:</h4>
-            <div id="publishers-list"></div>
-            <hr style="margin:20px 0">
-            <h4 style="margin-bottom:15px">أخبار معلقة للمراجعة:</h4>
-            <div id="pending-posts-list"></div>
+        <div class="admin-panel" style="background:#fff; color:#000">
+            <h4>👑 المعلنين الحاليين:</h4>
+            <div id="publishers-list-container"></div>
+            <hr style="margin:15px 0">
+            <h4>⏳ طلبات معلقة:</h4>
+            <div id="pending-requests"></div>
         </div>
-        
-        <button class="btn" style="background:#444; color:white; margin-bottom:100px" onclick="doLogout()">تسجيل الخروج</button>
+        <button class="btn" style="background:#ff4d4d; color:white; width:100%; padding:10px; border-radius:10px; margin-top:20px" onclick="doLogout()">خروج</button>
     </div>
 </div>
 
 <div id="page-add" class="page">
     <div class="container">
         <div class="news-card" style="padding:20px;">
-            <h3 style="margin-bottom:15px">نشر خبر جديد</h3>
-            <input type="text" id="postTitle" placeholder="عنوان الخبر الرئيسي">
-            <textarea id="postContent" rows="6" placeholder="اكتب تفاصيل الخبر هنا..."></textarea>
-            
-            <div style="text-align:center; margin:10px 0">
-                <img id="post-preview" style="width:100%; border-radius:12px; display:none; margin-bottom:10px">
-                <button class="btn" style="background:#f0f2f5" onclick="document.getElementById('post-file').click()"><i class="fas fa-image"></i> اختر صورة الخبر</button>
-                <input type="file" id="post-file" hidden accept="image/*" onchange="handleFileSelect(this, 'post')">
-            </div>
-
-            <div style="background:#f9f9f9; padding:15px; border-radius:12px; margin-bottom:15px">
-                <p style="font-size:12px; font-weight:bold; margin-bottom:5px">إضافة زر تواصل (اختياري):</p>
-                <input type="text" id="ctaText" placeholder="مثال: راسلنا واتساب">
-                <input type="text" id="ctaLink" placeholder="الرابط (https://...)">
-            </div>
-
-            <button class="btn btn-blue" id="publishBtn" onclick="publishPost()">إرسال للنشر</button>
+            <h3>نشر منشور</h3>
+            <input type="text" id="postTitle" placeholder="العنوان">
+            <textarea id="postContent" rows="5" placeholder="التفاصيل"></textarea>
+            <input type="file" id="f-in" hidden onchange="previewImg(this)">
+            <button class="btn" style="background:#eee; width:100%; padding:10px; margin:10px 0" onclick="document.getElementById('f-in').click()">إضافة صورة</button>
+            <img id="p-view" style="width:100%; border-radius:10px; display:none; margin-bottom:10px">
+            <button class="btn" style="background:var(--primary); color:white; width:100%; padding:10px" onclick="publish()">نشر</button>
         </div>
     </div>
 </div>
 
 <div class="bottom-nav">
     <div class="nav-item active" onclick="switchPage('page-feed', this)"><i class="fas fa-home"></i></div>
-    <div class="nav-item" onclick="checkAccess(this)"><i class="fas fa-plus-circle"></i></div>
-    <div class="nav-item" id="admin-icon" style="display:none" onclick="switchPage('page-admin', this)"><i class="fas fa-tools"></i></div>
+    <div class="nav-item" onclick="checkAdd(this)"><i class="fas fa-plus-circle"></i></div>
+    <div class="nav-item" id="admin-icon" style="display:none" onclick="switchPage('page-admin', this)"><i class="fas fa-cog"></i></div>
     <div class="nav-item" onclick="location.reload()"><i class="fas fa-sync"></i></div>
 </div>
 
 <script>
-    // تهيئة فايربيز
     const _dbUrl = atob("aHR0cHM6Ly9tYWhtb2R5YS03M2UwMy1kZWZhdWx0LXJ0ZGIuZmlyZWJhc2Vpby5jb20v");
     firebase.initializeApp({ databaseURL: _dbUrl });
     const db = firebase.database();
 
     let user = JSON.parse(localStorage.getItem('mahmoudya_user'));
-    let tempPostImg = "";
-    let tempOwnerImg = "";
-
-    // دالة الوقت النسبي الذكية
-    function timeAgo(ts) {
-        const diff = Math.floor((Date.now() - ts) / 1000);
-        if (diff < 60) return `منذ ${diff} ث`;
-        if (diff < 3600) return `منذ ${Math.floor(diff/60)} د`;
-        if (diff < 86400) return `منذ ${Math.floor(diff/3600)} س`;
-        return `منذ ${Math.floor(diff/86400)} يوم`;
-    }
+    let pImg = ""; let oImg = "";
 
     window.onload = () => {
         loadSettings();
         loadFeed();
-        trackVisit();
         if(user?.role === 'owner') {
-            document.getElementById('admin-icon').style.display = 'block';
-            loadAdminDashboard();
+            document.getElementById('admin-icon').style.display='block';
+            loadAdminPanel();
         }
     };
 
@@ -196,181 +121,141 @@
         db.ref('settings').on('value', s => {
             const d = s.val() || {};
             document.getElementById('siteNameDisplay').innerText = d.name || "المحمودية";
-            if(d.logo) document.getElementById('siteLogo').src = d.logo;
-            if(d.alert) {
-                document.getElementById('alertBar').style.display = 'block';
-                document.getElementById('alertText').innerText = d.alert;
-            }
-            if(user?.role === 'owner') {
-                document.getElementById('setSiteName').value = d.name || "";
-                document.getElementById('setLogo').value = d.logo || "";
-                document.getElementById('siteAlert').value = d.alert || "";
-            }
+            document.getElementById('siteLogo').src = d.logo || "https://cdn-icons-png.flaticon.com/512/1043/1043514.png";
         });
     }
 
-    async function startLogin() {
-        if(user) return;
-        const { value: pass } = await Swal.fire({ title: 'رمز الدخول', input: 'password', confirmButtonText: 'دخول' });
-        
-        if (pass === "2009257mama") {
-            db.ref('settings/ownerPic').once('value', s => {
-                const data = { role: 'owner', name: 'النجم', pic: s.val() || '' };
-                localStorage.setItem('mahmoudya_user', JSON.stringify(data));
-                location.reload();
-            });
-        } else if (pass === "2009257ma") {
-            handlePublisherSignup();
+    // نظام اللايك المطور
+    function toggleLike(postId, btn) {
+        const likedKey = `liked_${postId}`;
+        if(localStorage.getItem(likedKey)) {
+            // الغاء اللايك
+            db.ref(`posts/${postId}/likes`).transaction(c => (c || 1) - 1);
+            localStorage.removeItem(likedKey);
+            btn.classList.remove('liked');
+            btn.innerHTML = `<i class="far fa-thumbs-up"></i> إعجاب`;
+        } else {
+            // عمل لايك
+            db.ref(`posts/${postId}/likes`).transaction(c => (c || 0) + 1);
+            localStorage.setItem(likedKey, true);
+            btn.classList.add('liked');
+            btn.innerHTML = `<i class="fas fa-thumbs-up"></i> تم الإعجاب`;
         }
-    }
-
-    async function handlePublisherSignup() {
-        const { value: formValues } = await Swal.fire({
-            title: 'طلب انضمام معلن',
-            html: `
-                <input id="p_name" class="swal2-input" placeholder="اسمك">
-                <input id="p_phone" class="swal2-input" placeholder="رقم الهاتف">
-                <p style="font-size:12px; margin-top:10px">اختر صورتك الشخصية:</p>
-                <input type="file" id="p_file" class="swal2-file" accept="image/*">
-            `,
-            preConfirm: () => {
-                const f = document.getElementById('p_file').files[0];
-                return [document.getElementById('p_name').value, document.getElementById('p_phone').value, f];
-            }
-        });
-
-        if (formValues && formValues[0] && formValues[1]) {
-            let pi = "";
-            if(formValues[2]) {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    db.ref('pending_publishers').child(formValues[1]).set({ name: formValues[0], phone: formValues[1], pic: e.target.result });
-                    Swal.fire('تم الإرسال', 'انتظر موافقة النجم', 'info');
-                };
-                reader.readAsDataURL(formValues[2]);
-            } else {
-                db.ref('pending_publishers').child(formValues[1]).set({ name: formValues[0], phone: formValues[1], pic: "" });
-                Swal.fire('تم الإرسال', 'انتظر موافقة النجم', 'info');
-            }
-        }
-    }
-
-    function handleFileSelect(input, type) {
-        if (input.files && input.files[0]) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                if(type === 'post') {
-                    tempPostImg = e.target.result;
-                    document.getElementById('post-preview').src = e.target.result;
-                    document.getElementById('post-preview').style.display = 'block';
-                } else {
-                    tempOwnerImg = e.target.result;
-                    Swal.fire('تم اختيار صورتك، اضغط حفظ التعديلات');
-                }
-            };
-            reader.readAsDataURL(input.files[0]);
-        }
-    }
-
-    function publishPost() {
-        const t = document.getElementById('postTitle').value;
-        const c = document.getElementById('postContent').value;
-        if(!t || !c) return Swal.fire('خطأ', 'أكمل بيانات الخبر');
-
-        document.getElementById('publishBtn').disabled = true;
-        db.ref('posts').push({
-            title: t, content: c, img: tempPostImg,
-            ctaText: document.getElementById('ctaText').value,
-            ctaLink: document.getElementById('ctaLink').value,
-            author: user.name, authorPic: user.pic || '',
-            role: user.role, status: user.role === 'owner' ? 'approved' : 'pending',
-            time: Date.now(), views: 0
-        }).then(() => { Swal.fire('تم بنجاح'); location.reload(); });
     }
 
     function loadFeed() {
         db.ref('posts').on('value', s => {
             const feed = document.getElementById('news-feed');
             feed.innerHTML = "";
-            let items = [];
-            s.forEach(c => { 
-                let p = c.val(); p.key = c.key; 
-                if(p.status === 'approved' || (user?.role === 'owner')) items.push(p); 
-            });
-
-            db.ref('settings/ownerPic').once('value', ownerPicSnap => {
-                items.reverse().forEach(p => {
+            let posts = [];
+            s.forEach(c => { let p = c.val(); p.id = c.key; if(p.status === 'approved' || user?.role === 'owner') posts.push(p); });
+            
+            db.ref('settings/ownerPic').once('value', snap => {
+                posts.reverse().forEach(p => {
                     const isOwner = p.role === 'owner';
-                    const finalPic = isOwner ? (ownerPicSnap.val() || p.authorPic) : p.authorPic;
+                    const pic = isOwner ? (snap.val() || p.authorPic) : p.authorPic;
+                    const isLiked = localStorage.getItem(`liked_${p.id}`);
                     
-                    const html = `
+                    feed.innerHTML += `
                         <div class="news-card">
-                            ${user?.role === 'owner' ? `<div class="delete-btn" onclick="deletePost('${p.key}')"><i class="fas fa-trash"></i></div>` : ''}
+                            ${user?.role === 'owner' ? `<div class="delete-btn" onclick="deletePost('${p.id}')"><i class="fas fa-trash"></i></div>` : ''}
                             <div class="card-header">
-                                <img src="${finalPic || 'https://cdn-icons-png.flaticon.com/512/149/149071.png'}" class="author-img ${isOwner ? 'owner-glow' : ''}">
+                                <img src="${pic || ''}" class="author-img ${isOwner ? 'owner-glow' : ''}">
                                 <div>
                                     <span class="${isOwner ? 'star-badge' : ''}">${p.author}</span>
-                                    ${isOwner ? '<i class="fas fa-check-circle" style="color:#1da1f2; margin-right:4px"></i>' : ''}
-                                    <br><small style="color:gray">${timeAgo(p.time)}</small>
+                                    <br><small style="color:gray">${new Date(p.time).toLocaleTimeString('ar-EG')}</small>
                                 </div>
                             </div>
-                            ${p.img ? `<img src="${p.img}" class="news-img" onclick="incView('${p.key}')">` : ''}
+                            ${p.img ? `<img src="${p.img}" class="news-img" onclick="incView('${p.id}')">` : ''}
                             <div class="news-body"><h3>${p.title}</h3><p>${p.content}</p></div>
-                            ${(p.ctaText && p.ctaLink) ? `<a href="${p.ctaLink}" target="_blank" style="display:block; background:var(--primary); color:white; text-align:center; padding:12px; margin:0 15px 15px; border-radius:10px; text-decoration:none; font-weight:bold">${p.ctaText}</a>` : ''}
                             <div class="card-actions">
-                                <div class="action-btn"><i class="far fa-thumbs-up"></i> إعجاب</div>
-                                <div class="action-btn" onclick="sharePost('${p.title}')"><i class="fas fa-share-alt"></i> مشاركة</div>
+                                <div class="action-btn ${isLiked ? 'liked' : ''}" onclick="toggleLike('${p.id}', this)">
+                                    <i class="${isLiked ? 'fas' : 'far'} fa-thumbs-up"></i> ${isLiked ? 'تم الإعجاب' : 'إعجاب'}
+                                </div>
+                                <div class="action-btn" onclick="share('${p.title}')"><i class="fas fa-share"></i> مشاركة</div>
                                 <div class="action-btn"><i class="far fa-eye"></i> ${p.views || 0}</div>
                             </div>
                         </div>`;
-                    feed.innerHTML += html;
                 });
             });
         });
     }
 
-    function loadAdminDashboard() {
-        db.ref('analytics/visitors').on('value', s => document.getElementById('stat-v').innerText = s.numChildren());
+    function loadAdminPanel() {
+        // عرض المعلنين
         db.ref('approved_publishers').on('value', s => {
-            const list = document.getElementById('publishers-list');
+            const list = document.getElementById('publishers-list-container');
             list.innerHTML = "";
             s.forEach(c => {
-                list.innerHTML += `<div class="publisher-row">
-                    <span><img src="${c.val().pic || ''}" style="width:30px;height:30px;border-radius:50%;vertical-align:middle"> <b>${c.val().name}</b></span>
-                    <button onclick="removePub('${c.key}')" style="color:red; background:none; border:none"><i class="fas fa-trash"></i></button>
-                </div>`;
+                list.innerHTML += `
+                    <div class="publisher-item">
+                        <span><img src="${c.val().pic}" style="width:30px;height:30px;border-radius:50%;vertical-align:middle"> ${c.val().name}</span>
+                        <button onclick="removePub('${c.key}')" style="color:red;border:none;background:none"><i class="fas fa-user-slash"></i> حظر</button>
+                    </div>`;
             });
         });
+
+        // طلبات المعلنين
         db.ref('pending_publishers').on('value', s => {
+            const list = document.getElementById('pending-requests');
+            list.innerHTML = "";
             s.forEach(c => {
-                document.getElementById('publishers-list').innerHTML += `<div class="publisher-row" style="border:1px solid blue">
-                    <span>طلب: ${c.val().name}</span>
-                    <button onclick="approvePub('${c.val().name}','${c.key}','${c.val().pic}')" class="btn-blue" style="width:auto; padding:5px 10px; font-size:12px">قبول</button>
-                </div>`;
+                list.innerHTML += `
+                    <div class="publisher-item">
+                        <span>طلب من: ${c.val().name}</span>
+                        <button onclick="acceptPub('${c.val().name}','${c.key}','${c.val().pic}')" style="color:blue;border:none;background:none">قبول</button>
+                    </div>`;
             });
         });
     }
 
+    function acceptPub(n, ph, pi) { db.ref('approved_publishers').child(ph).set({name: n, pic: pi}).then(()=>db.ref('pending_publishers').child(ph).remove()); }
+    function removePub(ph) { if(confirm('حظر المعلن؟')) db.ref('approved_publishers').child(ph).remove(); }
+    function deletePost(id) { if(confirm('حذف؟')) db.ref('posts').child(id).remove(); }
+    function previewImg(i) { if(i.files[0]){ let r = new FileReader(); r.onload=(e)=>{ document.getElementById('p-view').src=e.target.result; document.getElementById('p-view').style.display='block'; pImg=e.target.result; }; r.readAsDataURL(i.files[0]); } }
+    function uploadOwnerPic(i) { if(i.files[0]){ let r = new FileReader(); r.onload=(e)=>{ oImg=e.target.result; }; r.readAsDataURL(i.files[0]); } }
+    
     function updateSettings() {
-        const up = { name: document.getElementById('setSiteName').value, logo: document.getElementById('setLogo').value, alert: document.getElementById('siteAlert').value };
-        if(tempOwnerImg) up.ownerPic = tempOwnerImg;
-        db.ref('settings').update(up).then(() => Swal.fire('تم التحديث بنجاح'));
+        let u = { name: document.getElementById('setSiteName').value, logo: document.getElementById('setLogo').value };
+        if(oImg) u.ownerPic = oImg;
+        db.ref('settings').update(u).then(()=>Swal.fire('تم الحفظ'));
     }
 
-    function approvePub(n, ph, pi) { db.ref('approved_publishers').child(ph).set({name: n, pic: pi}).then(()=>db.ref('pending_publishers').child(ph).remove()); }
-    function removePub(ph) { if(confirm('حذف؟')) db.ref('approved_publishers').child(ph).remove(); }
-    function deletePost(k) { if(confirm('حذف؟')) db.ref('posts').child(k).remove(); }
-    function incView(k) { db.ref('posts').child(k).child('views').transaction(v => (v || 0) + 1); }
-    function trackVisit() { const vid = localStorage.getItem('v_id') || 'v_' + Math.random().toString(36).substr(2, 9); localStorage.setItem('v_id', vid); db.ref('analytics/visitors').child(vid).set(true); }
-    function switchPage(id, el) { 
-        document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); 
-        document.getElementById(id).classList.add('active'); 
-        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active')); 
-        el.classList.add('active');
+    function publish() {
+        const t = document.getElementById('postTitle').value;
+        const c = document.getElementById('postContent').value;
+        if(!t || !c) return;
+        db.ref('posts').push({ title: t, content: c, img: pImg, author: user.name, authorPic: user.pic, role: user.role, status: user.role==='owner'?'approved':'pending', time: Date.now(), views: 0 });
+        location.reload();
     }
-    function checkAccess(el) { if(user) switchPage('page-add', el); else startLogin(); }
+
+    function switchPage(id, el) { document.querySelectorAll('.page').forEach(p=>p.classList.remove('active')); document.getElementById(id).classList.add('active'); document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active')); el.classList.add('active'); }
+    function checkAdd(el) { if(user) switchPage('page-add', el); else startLogin(); }
     function doLogout() { localStorage.clear(); location.reload(); }
-    function sharePost(t) { if(navigator.share) navigator.share({title: t, url: window.location.href}); else Swal.fire('تم نسخ الرابط'); }
+    function share(t) { if(navigator.share) navigator.share({title: t, url: window.location.href}); }
+    
+    async function startLogin() {
+        const { value: pass } = await Swal.fire({ title: 'الباسورد', input: 'password' });
+        if(pass === "2009257mama") {
+            db.ref('settings/ownerPic').once('value', s => { saveU({role:'owner', name:'النجم', pic:s.val()}); });
+        } else if(pass === "2009257ma") {
+            showSignup();
+        }
+    }
+    
+    async function showSignup() {
+        const { value: f } = await Swal.fire({
+            title: 'انضمام',
+            html: `<input id="n" class="swal2-input" placeholder="الاسم"><input id="p" class="swal2-input" placeholder="الهاتف"><input type="file" id="i" class="swal2-file">`,
+            preConfirm: () => [document.getElementById('n').value, document.getElementById('p').value, document.getElementById('i').files[0]]
+        });
+        if(f && f[2]) {
+            let r = new FileReader();
+            r.onload=(e)=> { db.ref('pending_publishers').child(f[1]).set({name:f[0], pic:e.target.result}); Swal.fire('انتظر القبول'); };
+            r.readAsDataURL(f[2]);
+        }
+    }
+    function saveU(d) { localStorage.setItem('mahmoudya_user', JSON.stringify(d)); location.reload(); }
 </script>
 </body>
 </html>
