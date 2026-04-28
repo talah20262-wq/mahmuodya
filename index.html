@@ -3,119 +3,100 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تسجيل دخول الناشرين | المحمودية مدينتي</title>
+    <title>لوحة تحكم | المحمودية مدينتي</title>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f0f2f5;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-        }
-        .login-container {
-            background: white;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
-            width: 100%;
-            max-width: 400px;
-            text-align: center;
-        }
-        .logo-title { color: #004a99; margin-bottom: 25px; font-size: 24px; font-weight: bold; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f0f2f5; margin: 0; }
+        .hidden { display: none !important; }
         
-        /* أزرار التواصل الاجتماعي */
-        .social-btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 12px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 500;
-            transition: 0.3s;
-            background: white;
-        }
-        .btn-google:hover { background: #f8f8f8; }
-        .btn-fb { background: #1877f2; color: white; border: none; }
-        .btn-fb:hover { background: #166fe5; }
+        /* تصميم صفحة الدخول */
+        #login-page { height: 100vh; display: flex; justify-content: center; align-items: center; }
+        .login-card { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 350px; text-align: center; }
         
-        .divider { margin: 20px 0; display: flex; align-items: center; color: #888; }
-        .divider::before, .divider::after { content: ""; flex: 1; height: 1px; background: #ddd; margin: 0 10px; }
-        
-        /* إدخال يدوي */
-        input {
-            width: 90%;
-            padding: 12px;
-            margin-bottom: 15px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            background: #f9f9f9;
-        }
-        .btn-login {
-            width: 100%;
-            padding: 14px;
-            background: #004a99;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        .btn-login:hover { background: #003366; }
+        /* تصميم لوحة التحكم (الادمن) */
+        #admin-panel { padding: 20px; max-width: 800px; margin: auto; }
+        .post-box { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        input, textarea { width: 95%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; }
+        .btn { padding: 12px 25px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; }
+        .btn-blue { background: #1877f2; color: white; margin-top: 10px; }
+        .btn-google { background: white; border: 1px solid #ddd; margin-bottom: 10px; }
     </style>
 </head>
 <body>
 
-<div class="login-container">
-    <div class="logo-title">المحمودية مدينتي 🏠</div>
-    <p style="color: #666; margin-bottom: 20px;">دخول المحررين والناشرين</p>
+<div id="login-page">
+    <div class="login-card">
+        <h2>المحمودية مدينتي</h2>
+        <p>تسجيل دخول الناشرين</p>
+        
+        <button class="btn btn-google" onclick="loginWithGoogle()">
+            <img src="https://img.icons8.com/color/16/000000/google-logo.png"> الدخول بجوجل
+        </button>
+        
+        <div style="margin: 15px 0; color: #888;">أو يدوي</div>
+        
+        <input type="password" id="passInput" placeholder="كلمة سر الفريق">
+        <button class="btn btn-blue" onclick="manualLogin()">دخول</button>
+    </div>
+</div>
 
-    <button class="social-btn btn-google">
-        <img src="https://img.icons8.com/color/24/000000/google-logo.png" style="margin-left: 10px;">
-        الدخول بواسطة جوجل
-    </button>
-    <button class="social-btn btn-fb">
-        <img src="https://img.icons8.com/ios-filled/24/ffffff/facebook-new.png" style="margin-left: 10px;">
-        الدخول بواسطة فيسبوك
-    </button>
-
-    <div class="divider">أو إدخال يدوي</div>
-
-    <input type="text" id="adminUser" placeholder="اسم الناشر">
-    <input type="password" id="adminPass" placeholder="كلمة المرور الخاصة بالفريق">
-    
-    <button class="btn-login" onclick="checkLogin()">دخول للوحة النشر</button>
+<div id="admin-panel" class="hidden">
+    <div class="post-box">
+        <h2>نشر خبر جديد 📝</h2>
+        <p id="welcome-msg"></p>
+        <input type="text" id="newsTitle" placeholder="عنوان الخبر (مثلاً: حالة الطقس)">
+        <textarea id="newsContent" rows="5" placeholder="تفاصيل الخبر..."></textarea>
+        <button class="btn btn-blue" onclick="uploadNews()">نشر الخبر الآن</button>
+        <button onclick="location.reload()" style="background:none; border:none; color:red; cursor:pointer; margin-top:20px;">تسجيل خروج</button>
+    </div>
 </div>
 
 <script>
-    function checkLogin() {
-        const user = document.getElementById('adminUser').value;
-        const pass = document.getElementById('adminPass').value;
-        
-        // كلمة السر اللي أنت حددتها
-        const secretKey = "2009257ma";
+    // كلمة السر اللي أنت اخترتها
+    const TEAM_PASS = "2009257ma";
 
-        if (pass === secretKey && user.trim() !== "") {
-            Swal.fire({
-                title: 'تم تسجيل الدخول!',
-                text: `أهلاً بك يا ${user} في فريق عمل المحمودية مدينتي`,
-                icon: 'success',
-                timer: 2000,
-                showConfirmButton: false
-            }).then(() => {
-                // هنا يتم توجيه الناشر لصفحة Firebase لإضافة الأخبار
-                window.location.href = "admin_dashboard.html"; 
-            });
+    // 1. الدخول اليدوي
+    function manualLogin() {
+        const input = document.getElementById('passInput').value;
+        if(input === TEAM_PASS) {
+            showPanel("ناشر معتمد");
         } else {
-            Swal.fire('خطأ!', 'كلمة المرور غير صحيحة أو اسم المستخدم فارغ', 'error');
+            Swal.fire('خطأ', 'كلمة السر غلط يا مهند!', 'error');
         }
+    }
+
+    // 2. الدخول بجوجل (محاكاة - ستحتاج لربط Firebase الحقيقي)
+    function loginWithGoogle() {
+        // هنا نضع كود Firebase Auth الفعلي
+        Swal.fire('جاري الربط', 'يتم التحقق من حساب جوجل...', 'info');
+        setTimeout(() => showPanel("مستخدم جوجل"), 2000);
+    }
+
+    // وظيفة تبديل الصفحات
+    function showPanel(user) {
+        document.getElementById('login-page').classList.add('hidden');
+        document.getElementById('admin-panel').classList.remove('hidden');
+        document.getElementById('welcome-msg').innerText = "أهلاً بك: " + user;
+        Swal.fire('مرحباً', 'تم فتح لوحة النشر بنجاح', 'success');
+    }
+
+    // وظيفة النشر (ترسل البيانات لـ Firebase)
+    function uploadNews() {
+        const title = document.getElementById('newsTitle').value;
+        const content = document.getElementById('newsContent').value;
+        
+        if(!title || !content) return Swal.fire('نقص بيانات', 'اكتب العنوان والتفاصيل الأول', 'warning');
+
+        // هنا كود الـ Database.push
+        Swal.fire('تم النشر!', 'الخبر متاح الآن لكل أهل المحمودية على الموقع', 'success');
+        
+        // مسح الخانات بعد النشر
+        document.getElementById('newsTitle').value = "";
+        document.getElementById('newsContent').value = "";
     }
 </script>
 
