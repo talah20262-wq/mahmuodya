@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>إمبراطورية النجم الملكية | الماستر 2026</title>
+    <title>إمبراطورية النجم الشاملة | 2026</title>
     
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
@@ -21,12 +21,14 @@
             --gold: #ffcc00;
             --red: #ff3b30;
             --green: #34c759;
+            --glass: rgba(255, 255, 255, 0.7);
         }
 
         [data-theme="dark"] {
             --bg: #000000;
             --card: #1c1c1e;
             --text: #ffffff;
+            --glass: rgba(28, 28, 30, 0.8);
         }
 
         * {
@@ -39,407 +41,348 @@
         body {
             background-color: var(--bg);
             color: var(--text);
-            transition: all 0.3s ease;
+            transition: all 0.4s ease;
             overflow-x: hidden;
-            padding-bottom: 100px;
+            padding-bottom: 110px;
         }
 
-        /* --- الهيدر الاحترافي --- */
+        /* --- الهيدر الملكي --- */
         header {
-            background: var(--card);
+            background: var(--glass);
+            backdrop-filter: blur(15px);
             padding: 15px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             position: sticky;
             top: 0;
-            z-index: 1000;
-            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+            z-index: 2000;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
         }
 
-        .header-left { display: flex; align-items: center; gap: 12px; }
-        .site-logo { width: 45px; height: 45px; border-radius: 50%; border: 2px solid var(--primary); padding: 2px; }
-        .site-info b { font-size: 16px; display: block; }
-        .site-info span { font-size: 10px; color: var(--green); font-weight: bold; }
-
-        .header-right { display: flex; gap: 18px; font-size: 20px; }
-
-        /* --- الإعلان المنبثق --- */
-        #ad-pop {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.85);
-            z-index: 9999;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            backdrop-filter: blur(5px);
+        .site-identity { display: flex; align-items: center; gap: 12px; }
+        .site-identity img {
+            width: 45px; height: 45px; border-radius: 50%;
+            border: 2px solid var(--primary);
+            box-shadow: 0 0 10px var(--primary);
         }
+        .site-identity h1 { font-size: 18px; font-weight: 900; }
 
-        .ad-box {
-            background: var(--card);
-            width: 100%;
-            max-width: 400px;
-            border-radius: 30px;
-            padding: 30px;
-            text-align: center;
-            position: relative;
-            transform: scale(0.7);
-            opacity: 0;
-            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        /* --- الإعلان المنبثق المحترف --- */
+        #ad-overlay {
+            display: none; position: fixed; inset: 0;
+            background: rgba(0,0,0,0.9); z-index: 9999;
+            align-items: center; justify-content: center; padding: 20px;
+            backdrop-filter: blur(8px);
         }
+        .ad-modal {
+            background: var(--card); width: 100%; max-width: 420px;
+            border-radius: 35px; padding: 30px; text-align: center;
+            position: relative; animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes popIn { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .ad-modal img { width: 100%; border-radius: 20px; margin-bottom: 15px; }
 
-        #ad-pop.show .ad-box { transform: scale(1); opacity: 1; }
-        .ad-img { width: 100%; border-radius: 20px; margin-bottom: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
-
-        /* --- الصفحات --- */
-        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        /* --- الحاويات والصفحات --- */
+        .container { max-width: 650px; margin: 0 auto; padding: 15px; }
         .page { display: none; }
-        .page.active { display: block; animation: pageIn 0.5s ease forwards; }
-
-        @keyframes pageIn {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        .page.active { display: block; animation: fadeInUp 0.5s ease; }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
 
         /* --- الكروت --- */
         .card {
-            background: var(--card);
-            border-radius: 24px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.05);
-            border: 1px solid rgba(255,255,255,0.05);
+            background: var(--card); border-radius: 28px; padding: 22px;
+            margin-bottom: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            border: 1px solid rgba(255,255,255,0.1); position: relative;
+            overflow: hidden;
+        }
+        .card::before {
+            content: ''; position: absolute; top: 0; right: 0; width: 5px; height: 100%;
+            background: var(--primary); opacity: 0.8;
         }
 
-        .post-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .post-author { display: flex; align-items: center; gap: 8px; font-weight: 700; }
-        .crown-icon { color: var(--gold); }
-        .badge { background: var(--gold); color: #000; font-size: 10px; padding: 2px 8px; border-radius: 6px; font-weight: 900; }
+        /* --- نظام الحالات (Status) --- */
+        .badge {
+            font-size: 10px; padding: 4px 10px; border-radius: 8px;
+            font-weight: 900; text-transform: uppercase;
+        }
+        .pending { background: #ff9500; color: #fff; }
+        .approved { background: var(--green); color: #fff; }
+        .rejected { background: var(--red); color: #fff; }
 
-        /* --- المدخلات والأزرار --- */
+        /* --- المدخلات --- */
         input, textarea, select {
-            width: 100%; padding: 15px; margin: 10px 0; border-radius: 15px;
+            width: 100%; padding: 16px; margin: 12px 0; border-radius: 18px;
             border: 1px solid rgba(0,0,0,0.1); background: var(--bg); color: var(--text);
             font-size: 15px; outline: none; transition: 0.3s;
         }
-        input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(0,122,255,0.2); }
+        input:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(0,122,255,0.15); }
 
         .btn {
-            width: 100%; padding: 16px; border: none; border-radius: 18px;
-            font-weight: 900; cursor: pointer; background: var(--primary);
-            color: #fff; font-size: 16px; transition: 0.3s; margin-top: 10px;
+            width: 100%; padding: 18px; border: none; border-radius: 20px;
+            font-weight: 900; cursor: pointer; transition: 0.3s; font-size: 16px;
         }
-        .btn:active { transform: scale(0.96); }
-        .btn-danger { background: var(--red); }
+        .btn-p { background: var(--primary); color: #fff; }
+        .btn-s { background: var(--green); color: #fff; }
+        .btn-d { background: var(--red); color: #fff; }
+        .btn:active { transform: scale(0.95); }
 
-        /* --- شريط التنقل السفلي --- */
-        .navbar {
+        /* --- الملاحة السفلية --- */
+        nav {
             position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-            width: 90%; max-width: 450px; background: var(--card);
-            border-radius: 35px; display: flex; justify-content: space-around;
-            padding: 15px; box-shadow: 0 15px 40px rgba(0,0,0,0.3); z-index: 5000;
+            width: 92%; max-width: 480px; background: var(--card);
+            border-radius: 40px; display: flex; justify-content: space-around;
+            padding: 18px; box-shadow: 0 20px 50px rgba(0,0,0,0.3); z-index: 5000;
         }
-        .nav-item { color: #8e8e93; font-size: 24px; cursor: pointer; transition: 0.3s; position: relative; }
-        .nav-item.active { color: var(--primary); transform: translateY(-8px); }
-        .nav-item.active::after {
-            content: ''; position: absolute; bottom: -8px; left: 50%;
-            transform: translateX(-50%); width: 6px; height: 6px;
-            background: var(--primary); border-radius: 50%;
-        }
+        .n-item { color: #8e8e93; font-size: 24px; cursor: pointer; transition: 0.3s; }
+        .n-item.active { color: var(--primary); transform: translateY(-10px); }
 
-        /* --- صندوق الرسائل للإدارة --- */
-        .msg-item {
-            background: var(--bg); border-radius: 15px; padding: 15px; margin-bottom: 12px;
-            border-right: 5px solid var(--primary); position: relative;
-        }
-        .msg-meta { font-size: 11px; margin-bottom: 5px; display: flex; justify-content: space-between; }
-        .msg-type { padding: 2px 7px; border-radius: 5px; color: #fff; font-weight: bold; font-size: 9px; }
+        /* لوحة التحكم الخاصة بالمالك */
+        .admin-action-bar { display: flex; gap: 8px; margin-top: 15px; }
+        .admin-action-bar button { flex: 1; padding: 10px; font-size: 12px; border-radius: 10px; }
     </style>
 </head>
-<body>
+<body data-theme="light">
 
-    <div id="ad-pop">
-        <div class="ad-box">
-            <i class="fas fa-times" onclick="closePop()" style="position:absolute; top:20px; left:20px; cursor:pointer; font-size:20px; opacity:0.5"></i>
-            <img id="pop-img" src="" class="ad-img" style="display:none">
-            <h2 id="pop-title" style="color:var(--primary); margin-bottom:10px"></h2>
-            <p id="pop-body" style="font-size:14px; line-height:1.6; margin-bottom:20px"></p>
-            <button class="btn" onclick="closePop()">استكشاف الآن</button>
+    <div id="ad-overlay">
+        <div class="ad-modal">
+            <i class="fas fa-times" onclick="closeAd()" style="position:absolute; top:20px; left:20px; cursor:pointer; font-size:22px; opacity:0.3"></i>
+            <img id="ad-view-img" src="" style="display:none">
+            <h2 id="ad-view-title" style="color:var(--primary); margin-bottom:12px"></h2>
+            <p id="ad-view-body" style="line-height:1.7; margin-bottom:20px; opacity:0.8"></p>
+            <button class="btn btn-p" onclick="closeAd()">فهمت، استكمال</button>
         </div>
     </div>
 
     <header>
-        <div class="header-left">
-            <img id="site-logo" class="site-logo" src="">
-            <div class="site-info">
-                <b id="site-name">جاري الاتصال...</b>
-                <span><i class="fas fa-circle"></i> مباشر</span>
+        <div class="site-identity">
+            <img id="site-logo" src="">
+            <div>
+                <h1 id="site-title">تحميل...</h1>
+                <small style="color:var(--green); font-weight:bold"><i class="fas fa-circle" style="font-size:8px"></i> النظام نشط</small>
             </div>
         </div>
-        <div class="header-right">
-            <i class="fas fa-search" onclick="toggleSearch()"></i>
-            <i id="theme-icon" class="fas fa-moon" onclick="toggleTheme()"></i>
-            <i class="fas fa-crown" onclick="checkAdmin()" style="color:var(--gold)"></i>
+        <div style="display:flex; gap:20px; align-items:center">
+            <i class="fas fa-adjust" onclick="toggleTheme()" style="font-size:20px; cursor:pointer"></i>
+            <i class="fas fa-crown" onclick="openAdmin()" style="font-size:22px; color:var(--gold); cursor:pointer"></i>
         </div>
     </header>
 
     <div class="container">
-        <div id="search-bar" style="display:none; margin-bottom:20px">
-            <input type="text" id="search-input" placeholder="ابحث في الأخبار..." oninput="searchNews()">
-        </div>
-
         <main id="page-home" class="page active">
-            <div id="news-feed"></div>
+            <div id="feed-container"></div>
         </main>
 
-        <section id="page-contact" class="page">
+        <section id="page-ads" class="page">
             <div class="card">
-                <h2 style="text-align:center; margin-bottom:20px">📨 مركز المراسلة</h2>
-                <label>نوع الطلب:</label>
-                <select id="msg-type">
-                    <option value="معلن">طلب إعلان تجاري (Business)</option>
-                    <option value="عميل">دعم فني / استفسار عملاء</option>
-                    <option value="اقتراح">اقتراح لتطوير الموقع</option>
-                </select>
-                <input type="text" id="msg-name" placeholder="الاسم أو اسم النشاط">
-                <input type="number" id="msg-phone" placeholder="رقم واتساب (للتواصل معك)">
-                <textarea id="msg-content" rows="5" placeholder="اكتب تفاصيل طلبك هنا بالكامل..."></textarea>
-                <button class="btn" onclick="sendMsg()">إرسال للمالك</button>
+                <h2 style="text-align:center; margin-bottom:15px">🏢 بوابة المعلنين</h2>
+                <p style="font-size:13px; text-align:center; opacity:0.7; margin-bottom:20px">ارفع إعلانك الآن، وسيقوم المالك بمراجعته والموافقة عليه.</p>
+                
+                <label>عنوان الإعلان:</label>
+                <input type="text" id="adv-title" placeholder="مثلاً: خصم 50% على الأحذية">
+                
+                <label>وصف الإعلان:</label>
+                <textarea id="adv-body" rows="5" placeholder="اكتب تفاصيل إعلانك هنا بوضوح..."></textarea>
+                
+                <button class="btn btn-p" onclick="requestAd()">إرسال للمراجعة الملكية</button>
             </div>
+
+            <div id="advertiser-status">
+                </div>
         </section>
 
-        <section id="page-admin" class="page">
-            <div class="card" style="border:2px solid var(--primary)">
-                <h3>📝 نشر محتوى جديد</h3>
-                <input type="text" id="post-title" placeholder="عنوان الخبر أو الإعلان">
-                <textarea id="post-content" rows="4" placeholder="المحتوى..."></textarea>
-                <button class="btn" onclick="publishPost()">نشر الآن</button>
+        <section id="page-owner" class="page">
+            <div class="card" style="border: 2px solid var(--gold); background: rgba(255,204,0,0.05);">
+                <h3 style="margin-bottom:15px">👑 إعدادات الملك</h3>
+                <button class="btn btn-p" style="margin-bottom:10px" onclick="setupPopup()">⚙️ ضبط الإعلان المنبثق</button>
+                <button class="btn btn-s" onclick="publishOfficialNews()">📢 نشر خبر رسمي باسمي</button>
             </div>
 
-            <div class="card" style="background:rgba(255, 204, 0, 0.1)">
-                <h3>📢 إعدادات الإعلان المنبثق (Popup)</h3>
-                <input type="text" id="set-pop-title" placeholder="عنوان الإعلان">
-                <textarea id="set-pop-body" placeholder="وصف الإعلان القصير"></textarea>
-                <input type="text" id="set-pop-img" placeholder="رابط صورة الإعلان (URL)">
-                <div style="display:flex; gap:10px">
-                    <button class="btn" onclick="updatePop(true)">تفعيل ونشر</button>
-                    <button class="btn btn-danger" onclick="updatePop(false)">إيقاف الإعلان</button>
-                </div>
-            </div>
+            <h3 style="margin:20px 0 10px"><i class="fas fa-clock"></i> طلبات المعلنين (تحت المراجعة)</h3>
+            <div id="owner-pending"></div>
 
-            <div class="card">
-                <h3>📥 الرسائل الواردة</h3>
-                <div id="admin-inbox" style="margin-top:15px"></div>
-            </div>
-
-            <button class="btn btn-danger" onclick="logout()">تسجيل خروج الإدارة</button>
+            <h3 style="margin:30px 0 10px"><i class="fas fa-check-circle"></i> الأخبار المنشورة حالياً</h3>
+            <div id="owner-published"></div>
         </section>
     </div>
 
-    <nav class="navbar">
-        <div class="nav-item active" onclick="switchPage('page-home', this)"><i class="fas fa-th-large"></i></div>
-        <div class="nav-item" onclick="switchPage('page-contact', this)"><i class="fas fa-paper-plane"></i></div>
-        <div id="admin-nav" class="nav-item" style="display:none" onclick="switchPage('page-admin', this)"><i class="fas fa-tools"></i></div>
+    <nav>
+        <div class="n-item active" onclick="navTo('page-home', this)"><i class="fas fa-home"></i></div>
+        <div class="n-item" onclick="navTo('page-ads', this)"><i class="fas fa-bullhorn"></i></div>
+        <div id="nav-crown" class="n-item" style="display:none" onclick="navTo('page-owner', this)"><i class="fas fa-user-shield"></i></div>
     </nav>
 
     <script>
-        // تكوين Firebase
-        const config = { databaseURL: atob("aHR0cHM6Ly9tYWhtb2R5YS03M2UwMy1kZWZhdWx0LXJ0ZGIuZmlyZWJhc2Vpby5jb20v") };
-        firebase.initializeApp(config);
-        const db = firebase.database();
+        // تكوين Firebase (الرابط المستخلص من ملفاتك)
+        const fbConfig = { databaseURL: atob("aHR0cHM6Ly9tYWhtb2R5YS03M2UwMy1kZWZhdWx0LXJ0ZGIuZmlyZWJhc2Vpby5jb20v") };
+        firebase.initializeApp(fbConfig);
+        const rdb = firebase.database();
 
-        let state = {
-            isAdmin: localStorage.getItem('isStarAdmin') === 'true',
-            allPosts: []
-        };
+        let session = JSON.parse(localStorage.getItem('user_session')) || { role: 'guest' };
 
         window.onload = () => {
-            loadSettings();
-            loadPosts();
-            checkPopStatus();
-            if(state.isAdmin) {
-                document.getElementById('admin-nav').style.display = 'block';
-                loadInbox();
+            syncUI();
+            fetchNews();
+            checkGlobalAd();
+            if(session.role === 'owner') {
+                document.getElementById('nav-crown').style.display = 'block';
+                syncOwnerPanel();
             }
         };
 
-        // إدارة الصفحات
-        function switchPage(pageId, el) {
+        function navTo(id, el) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.getElementById(pageId).classList.add('active');
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            document.querySelectorAll('.n-item').forEach(i => i.classList.remove('active'));
             el.classList.add('active');
             window.scrollTo(0,0);
         }
 
-        // إرسال رسالة للمالك
-        function sendMsg() {
-            const data = {
-                type: document.getElementById('msg-type').value,
-                name: document.getElementById('msg-name').value,
-                phone: document.getElementById('msg-phone').value,
-                msg: document.getElementById('msg-content').value,
-                date: new Date().toLocaleString('ar-EG')
-            };
+        // --- وظائف المعلن ---
+        function requestAd() {
+            const t = document.getElementById('adv-title').value;
+            const b = document.getElementById('adv-body').value;
+            if(!t || !b) return Swal.fire('خطأ', 'كمل البيانات يا بطل', 'error');
 
-            if(!data.name || !data.msg) return Swal.fire('نقص بيانات', 'املأ الاسم والرسالة يا كنج', 'warning');
-
-            db.ref('inbox').push(data).then(() => {
-                Swal.fire('تم الإرسال', 'رسالتك وصلت للمالك وهيرد عليك قريباً', 'success');
-                document.getElementById('msg-name').value = '';
-                document.getElementById('msg-content').value = '';
-            });
-        }
-
-        // نشر خبر جديد
-        function publishPost() {
-            const t = document.getElementById('post-title').value;
-            const c = document.getElementById('post-content').value;
-            if(!t || !c) return;
-
-            db.ref('posts').push({
-                title: t, content: c, time: Date.now(), author: 'المالك'
+            rdb.ref('cms_content').push({
+                title: t, body: b, status: 'pending', time: Date.now(), type: 'advertiser'
             }).then(() => {
-                Swal.fire('تم النشر', 'الخبر متاح الآن لكل المستخدمين', 'success');
-                document.getElementById('post-title').value = '';
-                document.getElementById('post-content').value = '';
+                Swal.fire('تم بنجاح', 'إعلانك وصل للمالك، انتظر الموافقة', 'success');
+                document.getElementById('adv-title').value = '';
+                document.getElementById('adv-body').value = '';
             });
         }
 
-        // تحميل الأخبار
-        function loadPosts() {
-            db.ref('posts').on('value', snap => {
-                const feed = document.getElementById('news-feed');
-                feed.innerHTML = '';
-                state.allPosts = [];
-                snap.forEach(child => {
-                    let p = child.val(); p.id = child.key;
-                    state.allPosts.push(p);
-                });
+        // --- وظائف المالك (التحكم الكامل) ---
+        function syncOwnerPanel() {
+            rdb.ref('cms_content').on('value', snap => {
+                const pend = document.getElementById('owner-pending');
+                const pub = document.getElementById('owner-published');
+                pend.innerHTML = ''; pub.innerHTML = '';
 
-                state.allPosts.reverse().forEach(post => {
+                snap.forEach(child => {
+                    const data = child.val();
+                    const key = child.key;
+                    const cardHtml = `
+                        <div class="card">
+                            <span class="badge ${data.status}">${data.status === 'pending' ? 'مطلوب مراجعته' : 'منشور الآن'}</span>
+                            <h4 style="margin:10px 0">${data.title}</h4>
+                            <p style="font-size:13px; opacity:0.8">${data.body}</p>
+                            <div class="admin-action-bar">
+                                ${data.status === 'pending' ? `<button class="btn btn-s" onclick="updateStatus('${key}', 'approved')">✅ موافقة</button>` : ''}
+                                <button class="btn btn-p" onclick="editNews('${key}', '${data.title}', '${data.body}')">📝 تعديل</button>
+                                <button class="btn btn-d" onclick="deleteNews('${key}')">🗑️ حذف</button>
+                            </div>
+                        </div>`;
+                    
+                    if(data.status === 'pending') pend.innerHTML += cardHtml;
+                    else pub.innerHTML += cardHtml;
+                });
+            });
+        }
+
+        function updateStatus(id, newStatus) {
+            rdb.ref(`cms_content/${id}`).update({ status: newStatus })
+            .then(() => Swal.fire('تم', 'تم تحديث حالة الخبر بنجاح', 'success'));
+        }
+
+        async function editNews(id, t, b) {
+            const { value: form } = await Swal.fire({
+                title: 'تعديل الخبر',
+                html: `<input id="et" class="swal2-input" value="${t}"><textarea id="eb" class="swal2-textarea">${b}</textarea>`,
+                preConfirm: () => [document.getElementById('et').value, document.getElementById('eb').value]
+            });
+            if(form) rdb.ref(`cms_content/${id}`).update({ title: form[0], body: form[1] });
+        }
+
+        function deleteNews(id) {
+            Swal.fire({ title: 'حذف نهائي؟', icon: 'warning', showCancelButton: true }).then(r => { if(r.isConfirmed) rdb.ref(`cms_content/${id}`).remove(); });
+        }
+
+        function publishOfficialNews() {
+            Swal.fire({
+                title: 'خبر ملكي رسمي',
+                html: `<input id="nt" class="swal2-input" placeholder="عنوان الخبر"><textarea id="nb" class="swal2-textarea" placeholder="محتوى الخبر الرسمي..."></textarea>`,
+                preConfirm: () => [document.getElementById('nt').value, document.getElementById('nb').value]
+            }).then(r => {
+                if(r.value) rdb.ref('cms_content').push({ title: r.value[0], body: r.value[1], status: 'approved', type: 'owner', time: Date.now() });
+            });
+        }
+
+        // --- نظام العرض (Home) ---
+        function fetchNews() {
+            rdb.ref('cms_content').on('value', snap => {
+                const feed = document.getElementById('feed-container');
+                feed.innerHTML = '';
+                let items = [];
+                snap.forEach(x => { if(x.val().status === 'approved') items.push(x.val()); });
+                items.reverse().forEach(i => {
                     feed.innerHTML += `
                         <div class="card">
-                            <div class="post-header">
-                                <div class="post-author">
-                                    <i class="fas fa-crown crown-icon"></i>
-                                    <span>المالك الكنج</span>
-                                    <span class="badge">رسمي</span>
-                                </div>
-                                ${state.isAdmin ? `<i class="fas fa-trash" style="color:var(--red)" onclick="deleteItem('posts/${post.id}')"></i>` : ''}
+                            <div style="display:flex; justify-content:space-between; align-items:center">
+                                <b style="color:var(--primary)"><i class="fas fa-crown"></i> ${i.type === 'owner' ? 'المالك' : 'إعلان معتمد'}</b>
+                                <small style="opacity:0.4">${new Date(i.time).toLocaleTimeString()}</small>
                             </div>
-                            <h2 style="margin-bottom:10px; font-size:18px">${post.title}</h2>
-                            <p style="font-size:14px; opacity:0.9; line-height:1.7">${post.content}</p>
-                        </div>
-                    `;
+                            <h2 style="margin:12px 0; font-size:20px">${i.title}</h2>
+                            <p style="line-height:1.8; font-size:15px">${i.body}</p>
+                        </div>`;
                 });
             });
         }
 
-        // إدارة الإعلان المنبثق
-        function updatePop(status) {
-            const data = {
-                active: status,
-                title: document.getElementById('set-pop-title').value,
-                body: document.getElementById('set-pop-body').value,
-                img: document.getElementById('set-pop-img').value
-            };
-            db.ref('popup').set(data).then(() => Swal.fire('تم التحديث'));
+        // --- إعدادات الإعلان المنبثق ---
+        async function setupPopup() {
+            const { value: pData } = await Swal.fire({
+                title: 'إعداد الـ Popup',
+                html: `<input id="pt" class="swal2-input" placeholder="العنوان"><textarea id="pb" class="swal2-textarea" placeholder="النص"></textarea><input id="pi" class="swal2-input" placeholder="رابط صورة (اختياري)">`,
+                showDenyButton: true, denyButtonText: 'تعطيل الإعلان', confirmButtonText: 'تفعيل الآن'
+            });
+            if(pData) {
+                rdb.ref('global_ad').set({ active: true, title: document.getElementById('pt').value, body: document.getElementById('pb').value, img: document.getElementById('pi').value });
+            } else if (Swal.getContent() === null) {
+                rdb.ref('global_ad/active').set(false);
+            }
         }
 
-        function checkPopStatus() {
-            db.ref('popup').on('value', snap => {
-                const d = snap.val();
-                if(d && d.active && !sessionStorage.getItem('popDone')) {
-                    const pop = document.getElementById('ad-pop');
-                    pop.style.display = 'flex';
-                    setTimeout(() => pop.classList.add('show'), 50);
-                    document.getElementById('pop-title').innerText = d.title;
-                    document.getElementById('pop-body').innerText = d.body;
+        function checkGlobalAd() {
+            rdb.ref('global_ad').on('value', s => {
+                const d = s.val();
+                if(d && d.active && !sessionStorage.popSeen) {
+                    document.getElementById('ad-overlay').style.display = 'flex';
+                    document.getElementById('ad-view-title').innerText = d.title;
+                    document.getElementById('ad-view-body').innerText = d.body;
                     if(d.img) {
-                        document.getElementById('pop-img').src = d.img;
-                        document.getElementById('pop-img').style.display = 'block';
+                        document.getElementById('ad-view-img').src = d.img;
+                        document.getElementById('ad-view-img').style.display = 'block';
                     }
                 }
             });
         }
 
-        function closePop() {
-            document.getElementById('ad-pop').classList.remove('show');
-            setTimeout(() => document.getElementById('ad-pop').style.display = 'none', 400);
-            sessionStorage.setItem('popDone', 'true');
-        }
-
-        // لوحة إدارة الرسائل
-        function loadInbox() {
-            db.ref('inbox').on('value', snap => {
-                const box = document.getElementById('admin-inbox');
-                box.innerHTML = '';
-                snap.forEach(child => {
-                    const m = child.val();
-                    const color = m.type === 'معلن' ? '#ff9500' : '#34c759';
-                    box.innerHTML += `
-                        <div class="msg-item" style="border-right-color:${color}">
-                            <div class="msg-meta">
-                                <span class="msg-type" style="background:${color}">${m.type}</span>
-                                <span>${m.date}</span>
-                            </div>
-                            <b>${m.name}</b> <small>(${m.phone})</small>
-                            <p style="margin-top:8px">${m.msg}</p>
-                            <div style="text-align:left">
-                                <i class="fas fa-trash-alt" style="color:red; cursor:pointer" onclick="deleteItem('inbox/${child.key}')"></i>
-                            </div>
-                        </div>
-                    `;
-                });
-            });
-        }
-
-        // وظائف مساعدة
-        async function checkAdmin() {
-            if(state.isAdmin) return switchPage('page-admin', document.getElementById('admin-nav'));
-            const { value: pass } = await Swal.fire({ title: 'كود المالك', input: 'password', inputAttributes: { autocapitalize: 'off' } });
+        // --- الحماية والدخول ---
+        async function openAdmin() {
+            if(session.role === 'owner') return navTo('page-owner', document.getElementById('nav-crown'));
+            const { value: pass } = await Swal.fire({ title: 'كلمة سر الملك', input: 'password' });
             if(pass === "2009257mama") {
-                localStorage.setItem('isStarAdmin', 'true');
+                session.role = 'owner';
+                localStorage.setItem('user_session', JSON.stringify(session));
                 location.reload();
             }
         }
 
-        function loadSettings() {
-            db.ref('settings').on('value', s => {
+        function syncUI() {
+            rdb.ref('settings').on('value', s => {
                 const d = s.val() || {};
-                document.getElementById('site-name').innerText = d.name || "إمبراطورية النجم";
+                document.getElementById('site-title').innerText = d.name || "إمبراطورية النجم";
                 document.getElementById('site-logo').src = d.logo || "https://cdn-icons-png.flaticon.com/512/3135/3135715.png";
             });
         }
 
-        function deleteItem(path) {
-            Swal.fire({ title: 'حذف؟', icon: 'warning', showCancelButton: true }).then(res => { if(res.isConfirmed) db.ref(path).remove(); });
+        function closeAd() { document.getElementById('ad-overlay').style.display = 'none'; sessionStorage.popSeen = 1; }
+        function toggleTheme() { 
+            const theme = document.body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+            document.body.setAttribute('data-theme', theme);
         }
-
-        function toggleTheme() {
-            const b = document.body;
-            const isDark = b.getAttribute('data-theme') === 'dark';
-            b.setAttribute('data-theme', isDark ? 'light' : 'dark');
-            document.getElementById('theme-icon').className = isDark ? 'fas fa-moon' : 'fas fa-sun';
-        }
-
-        function toggleSearch() {
-            const s = document.getElementById('search-bar');
-            s.style.display = s.style.display === 'none' ? 'block' : 'none';
-        }
-
-        function searchNews() {
-            const query = document.getElementById('search-input').value.toLowerCase();
-            const cards = document.querySelectorAll('#news-feed .card');
-            cards.forEach(card => {
-                const text = card.innerText.toLowerCase();
-                card.style.display = text.includes(query) ? 'block' : 'none';
-            });
-        }
-
         function logout() { localStorage.clear(); location.reload(); }
     </script>
 </body>
