@@ -25,35 +25,53 @@
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         /* Cards & Forms */
-        .card { background: var(--c); border-radius: 20px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .card { background: var(--c); border-radius: 20px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.05); }
         input, textarea, select { width: 100%; padding: 12px; margin: 10px 0; border-radius: 12px; border: 1px solid #ddd; background: var(--bg); color: var(--t); }
-        .btn-m { width: 100%; padding: 15px; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; background: var(--p); color: #fff; }
+        .btn-m { width: 100%; padding: 15px; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; background: var(--p); color: #fff; transition: 0.3s; }
+        .btn-m:active { transform: scale(0.95); }
         
         /* Admin Badge */
         .k-tag { background: var(--gold); color: #000; font-size: 10px; padding: 2px 8px; border-radius: 5px; font-weight: 900; }
 
-        /* Inbox Style */
-        .msg-item { border-right: 4px solid var(--p); padding: 10px; background: var(--bg); border-radius: 8px; margin-bottom: 10px; position: relative; }
-        .msg-type { font-size: 10px; font-weight: bold; padding: 2px 6px; border-radius: 4px; float: left; }
-        .type-client { background: #34c759; color: #fff; }
-        .type-ads { background: #ff9500; color: #fff; }
+        /* Pop-up Ad Style */
+        #ad-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center; padding: 20px; }
+        .ad-content { background: var(--c); width: 100%; max-width: 400px; border-radius: 25px; padding: 25px; text-align: center; position: relative; animation: zoomIn 0.3s; }
+        .ad-img { width: 100%; border-radius: 15px; margin-bottom: 15px; }
+        @keyframes zoomIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+        /* Messages */
+        .msg-item { border-right: 4px solid var(--p); padding: 12px; background: var(--bg); border-radius: 10px; margin-bottom: 12px; }
+        .type-badge { font-size: 10px; font-weight: bold; padding: 2px 6px; border-radius: 4px; color: #fff; margin-bottom: 5px; display: inline-block; }
 
         /* Navigation */
-        nav { position: fixed; bottom: 15px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 450px; background: var(--c); border-radius: 30px; display: flex; justify-content: space-around; padding: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); z-index: 1000; }
-        .n-btn { color: #8e8e93; font-size: 22px; cursor: pointer; }
-        .n-btn.active { color: var(--p); }
+        nav { position: fixed; bottom: 15px; left: 50%; transform: translateX(-50%); width: 92%; max-width: 450px; background: var(--c); border-radius: 30px; display: flex; justify-content: space-around; padding: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); z-index: 1000; }
+        .n-btn { color: #8e8e93; font-size: 22px; cursor: pointer; transition: 0.2s; }
+        .n-btn.active { color: var(--p); transform: translateY(-5px); }
     </style>
 </head>
-<body>
+<body data-theme="light">
+
+<div id="ad-modal">
+    <div class="ad-content">
+        <i class="fas fa-times" onclick="closeAd()" style="position:absolute; top:15px; left:15px; cursor:pointer; opacity:0.5"></i>
+        <img id="ad-img-view" src="" class="ad-img" style="display:none">
+        <h2 id="ad-title-view" style="color:var(--p)">إعلان هام</h2>
+        <p id="ad-body-view" style="margin:15px 0; line-height:1.6"></p>
+        <button class="btn-m" onclick="closeAd()">حسناً</button>
+    </div>
+</div>
 
 <header>
     <div style="display:flex; align-items:center; gap:10px">
-        <img id="siteLogo" src="" style="width:40px; border-radius:50%">
-        <b id="siteName">تحميل...</b>
+        <img id="siteLogo" src="" style="width:40px; height:40px; border-radius:50%; object-fit:cover">
+        <div>
+            <b id="siteName" style="font-size:14px">جاري التحميل...</b><br>
+            <small style="color:var(--p); font-size:10px"><i class="fas fa-circle"></i> أونلاين</small>
+        </div>
     </div>
     <div style="display:flex; gap:15px">
-        <i class="fas fa-moon" onclick="toggleT()"></i>
-        <i class="fas fa-shield-alt" onclick="loginAdmin()"></i>
+        <i class="fas fa-adjust" onclick="toggleT()" style="cursor:pointer"></i>
+        <i class="fas fa-user-shield" onclick="loginAdmin()" style="cursor:pointer"></i>
     </div>
 </header>
 
@@ -64,39 +82,46 @@
 
     <section id="p-contact" class="page">
         <div class="card">
-            <h2 style="text-align:center">📬 مركز التواصل</h2>
-            <p style="text-align:center; font-size:12px; opacity:0.7">رسالتك تصل للمالك مباشرة</p>
+            <h2 style="text-align:center; color:var(--p)">📫 أرسل لنا</h2>
             <select id="con-type">
-                <option value="client">رسالة عميل / شكوى</option>
-                <option value="ads">طلب إعلان / تعاون</option>
+                <option value="عميل">شكوى أو استفسار عميل</option>
+                <option value="معلن">طلب إعلان ممول</option>
             </select>
-            <input type="text" id="con-name" placeholder="اسمك الكريم">
-            <input type="text" id="con-phone" placeholder="رقم الواتساب للتواصل">
-            <textarea id="con-msg" rows="4" placeholder="اكتب تفاصيل طلبك هنا..."></textarea>
-            <button class="btn-m" onclick="sendToOwner()">إرسال الطلب الآن</button>
+            <input type="text" id="con-name" placeholder="الاسم الكامل">
+            <input type="text" id="con-phone" placeholder="رقم واتساب">
+            <textarea id="con-msg" rows="4" placeholder="اكتب رسالتك هنا..."></textarea>
+            <button class="btn-m" onclick="sendToOwner()">إرسال للمالك الآن</button>
         </div>
     </section>
 
     <section id="p-admin" class="page">
         <div class="card" style="border: 2px solid var(--p)">
-            <h3>👑 نشر خبر جديد</h3>
+            <h3>🚀 نشر خبر عاجل</h3>
             <input type="text" id="adm-t" placeholder="عنوان الخبر">
-            <textarea id="adm-c" placeholder="التفاصيل..."></textarea>
-            <button class="btn-m" onclick="postNews()">نشر الخبر</button>
+            <textarea id="adm-c" placeholder="محتوى الخبر بالكامل..."></textarea>
+            <button class="btn-m" onclick="postNews()">نشر الخبر للجميع</button>
+        </div>
+
+        <div class="card" style="background:#fff9c4; color:#000">
+            <h3>📢 إدارة الإعلان المنبثق (Pop-up)</h3>
+            <input type="text" id="ad-title-set" placeholder="عنوان الإعلان">
+            <textarea id="ad-body-set" placeholder="نص الإعلان المنبثق"></textarea>
+            <input type="text" id="ad-img-set" placeholder="رابط صورة الإعلان (اختياري)">
+            <div style="display:flex; gap:10px">
+                <button class="btn-m" onclick="saveAd(true)">تفعيل ونشر</button>
+                <button class="btn-m" style="background:#ff3b30" onclick="saveAd(false)">إيقاف الإعلان</button>
+            </div>
         </div>
 
         <div class="card">
-            <h3>📥 صندوق الوارد (رسائل العملاء والمعلنين)</h3>
-            <div id="admin-inbox" style="margin-top:15px">
-                </div>
+            <h3>📩 الرسائل الواردة</h3>
+            <div id="admin-inbox" style="margin-top:15px"></div>
         </div>
 
         <div class="card">
-            <h3>⚙️ الإدارة العامة</h3>
-            <button class="btn-m" style="background:#ff3b30" onclick="togMaint()">تفعيل/إيقاف الصيانة</button>
-            <button class="btn-m" style="background:#444; margin-top:10px" onclick="logout()">خروج</button>
+            <button class="btn-m" style="background:#444" onclick="logout()">تسجيل خروج الإدارة</button>
         </div>
-    </section> section>
+    </section>
 </div>
 
 <nav>
@@ -106,22 +131,23 @@
 </nav>
 
 <script>
-    // تهيئة Firebase (باستخدام الرابط المكتشف من صورك)
-    const config = { databaseURL: atob("aHR0cHM6Ly9tYWhtb2R5YS03M2UwMy1kZWZhdWx0LXJ0ZGIuZmlyZWJhc2Vpby5jb20v") };
-    firebase.initializeApp(config);
+    const _dbUrl = atob("aHR0cHM6Ly9tYWhtb2R5YS03M2UwMy1kZWZhdWx0LXJ0ZGIuZmlyZWJhc2Vpby5jb20v");
+    firebase.initializeApp({ databaseURL: _dbUrl });
     const db = firebase.database();
 
-    let user = JSON.parse(localStorage.getItem('star_user')) || { role: 'guest' };
+    let user = JSON.parse(localStorage.getItem('star_session')) || { role: 'guest' };
 
     window.onload = () => {
         syncSettings();
         loadNews();
+        checkPopup();
         if(user.role === 'owner') {
             document.getElementById('adm-link').style.display = 'block';
             loadInbox();
         }
     };
 
+    // تبديل الصفحات
     function tab(id, el) {
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
         document.getElementById(id).classList.add('active');
@@ -129,25 +155,86 @@
         el.classList.add('active');
     }
 
-    // للمستخدم: إرسال رسالة للمالك
+    // إرسال رسالة للمالك
     function sendToOwner() {
         const type = document.getElementById('con-type').value;
         const name = document.getElementById('con-name').value;
         const phone = document.getElementById('con-phone').value;
         const msg = document.getElementById('con-msg').value;
 
-        if(!name || !msg) return Swal.fire('تنبيه', 'كمل البيانات يا بطل', 'warning');
+        if(!name || !msg) return Swal.fire('خطأ', 'يرجى كتابة اسمك ورسالتك', 'error');
 
-        db.ref('inbox').push({
-            type, name, phone, msg, time: Date.now()
-        }).then(() => {
-            Swal.fire('تم الإرسال', 'وصلت رسالتك للملك وسيرد عليك قريباً', 'success');
+        db.ref('inbox').push({ type, name, phone, msg, time: Date.now() }).then(() => {
+            Swal.fire('شكراً لك', 'تم إرسال رسالتك بنجاح', 'success');
             document.getElementById('con-name').value = "";
             document.getElementById('con-msg').value = "";
         });
     }
 
-    // للمالك: عرض الرسائل الواردة
+    // إدارة الإعلان المنبثق
+    function saveAd(status) {
+        const t = document.getElementById('ad-title-set').value;
+        const b = document.getElementById('ad-body-set').value;
+        const i = document.getElementById('ad-img-set').value;
+        db.ref('popup_ad').set({ active: status, title: t, body: b, img: i }).then(() => {
+            Swal.fire('تم التحديث', 'تم تغيير حالة الإعلان المنبثق', 'success');
+        });
+    }
+
+    function checkPopup() {
+        db.ref('popup_ad').on('value', s => {
+            const data = s.val();
+            if(data && data.active && !sessionStorage.getItem('ad_closed')) {
+                document.getElementById('ad-modal').style.display = 'flex';
+                document.getElementById('ad-title-view').innerText = data.title;
+                document.getElementById('ad-body-view').innerText = data.body;
+                if(data.img) {
+                    document.getElementById('ad-img-view').src = data.img;
+                    document.getElementById('ad-img-view').style.display = 'block';
+                }
+            }
+        });
+    }
+
+    function closeAd() {
+        document.getElementById('ad-modal').style.display = 'none';
+        sessionStorage.setItem('ad_closed', 'true');
+    }
+
+    // إدارة الأخبار
+    function postNews() {
+        const t = document.getElementById('adm-t').value;
+        const c = document.getElementById('adm-c').value;
+        if(!t || !c) return;
+        db.ref('posts').push({ title: t, content: c, author: 'المالك الكنج', time: Date.now() })
+        .then(() => { 
+            Swal.fire('تم النشر بنجاح');
+            document.getElementById('adm-t').value = "";
+            document.getElementById('adm-c').value = "";
+        });
+    }
+
+    function loadNews() {
+        db.ref('posts').on('value', s => {
+            const feed = document.getElementById('news-feed');
+            feed.innerHTML = "";
+            let posts = [];
+            s.forEach(x => { let p = x.val(); p.key = x.key; posts.push(p); });
+            posts.reverse().forEach(p => {
+                feed.innerHTML += `
+                <div class="card">
+                    <div style="display:flex; justify-content:space-between">
+                        <b>المالك <span class="k-tag">الكنج 👑</span></b>
+                        ${user.role==='owner' ? `<i class="fas fa-trash" style="color:red" onclick="delItem('posts/${p.key}')"></i>` : ''}
+                    </div>
+                    <h3 style="margin-top:10px; color:var(--p)">${p.title}</h3>
+                    <p style="font-size:14px; opacity:0.8">${p.content}</p>
+                </div>`;
+            });
+        });
+    }
+
+    // صندوق الوارد للمالك
     function loadInbox() {
         db.ref('inbox').on('value', s => {
             const div = document.getElementById('admin-inbox');
@@ -156,47 +243,22 @@
                 const m = x.val();
                 div.innerHTML += `
                 <div class="msg-item">
-                    <span class="msg-type ${m.type==='ads'?'type-ads':'type-client'}">${m.type==='ads'?'إعلان':'عميل'}</span>
-                    <b>من: ${m.name}</b> <small>(${m.phone})</small>
-                    <p style="font-size:13px; margin-top:5px">${m.msg}</p>
-                    <button onclick="delItem('inbox/${x.key}')" style="background:none; border:none; color:red; cursor:pointer; font-size:10px">حذف الرسالة</button>
+                    <span class="type-badge" style="background:${m.type==='معلن'?'#ff9500':'#34c759'}">${m.type}</span>
+                    <b>${m.name}</b> <small>(${m.phone})</small>
+                    <p style="margin-top:5px; font-size:13px">${m.msg}</p>
+                    <button onclick="delItem('inbox/${x.key}')" style="background:none; border:none; color:red; font-size:11px; cursor:pointer">حذف الرسالة</button>
                 </div>`;
             });
         });
     }
 
-    // الميزات الأساسية
-    function postNews() {
-        const t = document.getElementById('adm-t').value;
-        const c = document.getElementById('adm-c').value;
-        db.ref('posts').push({ title: t, content: c, author: 'المالك الكنج', time: Date.now() })
-        .then(() => { Swal.fire('تم النشر'); });
-    }
-
-    function loadNews() {
-        db.ref('posts').on('value', s => {
-            const feed = document.getElementById('news-feed');
-            feed.innerHTML = "";
-            s.forEach(x => {
-                const p = x.val();
-                feed.innerHTML += `
-                <div class="card">
-                    <div style="display:flex; justify-content:space-between">
-                        <b>${p.author} <span class="k-tag">المالك الكنج</span></b>
-                        ${user.role==='owner' ? `<i class="fas fa-trash" onclick="delItem('posts/${x.key}')"></i>` : ''}
-                    </div>
-                    <h3 style="margin-top:10px; color:var(--p)">${p.title}</h3>
-                    <p>${p.content}</p>
-                </div>`;
-            });
-        });
-    }
-
+    // إعدادات ودخول
     async function loginAdmin() {
-        const { value: p } = await Swal.fire({ title: 'كود المالك', input: 'password' });
+        if(user.role === 'owner') return tab('p-admin', document.getElementById('adm-link'));
+        const { value: p } = await Swal.fire({ title: 'الرمز السري للمالك', input: 'password' });
         if(p === "2009257mama") {
             user = { role: 'owner' };
-            localStorage.setItem('star_user', JSON.stringify(user));
+            localStorage.setItem('star_session', JSON.stringify(user));
             location.reload();
         }
     }
@@ -209,7 +271,9 @@
         });
     }
 
-    function delItem(path) { db.ref(path).remove(); }
+    function delItem(path) { 
+        Swal.fire({ title: 'حذف؟', icon: 'warning', showCancelButton: true }).then(r => { if(r.isConfirmed) db.ref(path).remove(); });
+    }
     function toggleT() { document.body.setAttribute('data-theme', document.body.getAttribute('data-theme')==='dark'?'light':'dark'); }
     function logout() { localStorage.clear(); location.reload(); }
 </script>
